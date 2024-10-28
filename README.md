@@ -1,2 +1,2 @@
 # GYMBUDDY
-TeamAdore
+Team ADOR

@@ -2,9 +2,208 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - GymBuddy</title>
+    <style>
+        /* Reset some basic styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Centering the form */
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f3f7fa;
+            padding: 20px;
+        }
+
+        /* Form container styling */
+        .signup-container {
+            background-color: #ffffff;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .signup-container:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Heading styling */
+        .signup-container h2 {
+            margin-bottom: 30px;
+            font-size: 26px;
+            color: #333;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* Grid layout for form fields */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            text-align: left;
+        }
+
+        label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input[type="text"], input[type="email"], input[type="password"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+        }
+
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="number"]:focus {
+            border-color: #007bff;
+            background-color: #fff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+            outline: none;
+        }
+
+        /* Full-width styling for single-column elements */
+        .full-width {
+            grid-column: span 2;
+        }
+
+        /* Sign Up button styling */
+        .signup-button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .signup-button:hover {
+            background-color: #0056b3;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+        }
+
+        /* Back to Login button styling */
+        .back-button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border: 1px solid #007bff;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            color: #007bff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+        }
+
+        .back-button:hover {
+            background-color: #e1e9f0;
+            color: #0056b3;
+        }
+
+        /* Responsive adjustments for mobile devices */
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr; /* Stack fields on smaller screens */
+            }
+
+            .full-width {
+                grid-column: span 1;
+            }
+        }
+    </style>
 </head>
 <body>
-
+    <div class="signup-container">
+        <h2>Create Your GymBuddy Account</h2>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="form-grid">
+                <div class="form-group">
+                    {{ form.username.label }}
+                    {{ form.username(class="form-control", placeholder="Choose a username", required=True) }}
+                </div>
+                <div class="form-group">
+                    {{ form.name.label }}
+                    {{ form.name(class="form-control", placeholder="Enter your first name", required=True) }}
+                </div>
+                <div class="form-group">
+                    {{ form.surname.label }}
+                    {{ form.surname(class="form-control", placeholder="Enter your last name", required=True) }}
+                </div>
+                <div class="form-group">
+                    {{ form.email.label }}
+                    {{ form.email(class="form-control", placeholder="Enter your email", required=True) }}
+                </div>
+                <div class="form-group">
+                    {{ form.password.label }}
+                    {{ form.password(class="form-control", placeholder="Enter a password", required=True) }}
+                </div>
+                <div class="form-group">
+                    {{ form.confirm_password.label }}
+                    {{ form.confirm_password(class="form-control", placeholder="Confirm your password", required=True) }}
+                </div>
+                <div class="form-group">
+                    {{ form.height.label }}
+                    {{ form.height(class="form-control", placeholder="Enter your height in cm") }}
+                </div>
+                <div class="form-group">
+                    {{ form.weight.label }}
+                    {{ form.weight(class="form-control", placeholder="Enter your weight in kg") }}
+                </div>
+                <div class="form-group">
+                    {{ form.blood_type.label }}
+                    {{ form.blood_type(class="form-control", placeholder="Enter your blood type") }}
+                </div>
+                <div class="form-group">
+                    {{ form.phone_number.label }}
+                    {{ form.phone_number(class="form-control", placeholder="Enter your phone number", required=True) }}
+                </div>
+                <div class="form-group">
+                    {{ form.emergency_contact_name.label }}
+                    {{ form.emergency_contact_name(class="form-control", placeholder="Emergency contact name", required=True) }}
+                </div>
+                <div class="form-group">
+                    {{ form.emergency_contact_number.label }}
+                    {{ form.emergency_contact_number(class="form-control", placeholder="Emergency contact number", required=True) }}
+                </div>
+            </div>
+            <div class="full-width">
+                {{ form.submit(class="signup-button") }}
+            </div>
+            <a href="{{ url_for('auth_bp.login') }}" class="back-button">Go back to Login</a>
+        </form>
+    </div>
 </body>
 </html>

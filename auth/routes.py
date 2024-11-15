@@ -44,7 +44,7 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user)
             flash('Logged in successfully.')
-            return redirect(url_for('main_bp.dashboard'))
+            return redirect(url_for('home'))  # Redirect to home page
         else:
             flash('Invalid username or password.')
     return render_template('login.html', form=form)
@@ -56,3 +56,45 @@ def logout():
     logout_user()
     flash('You have been logged out.')
     return redirect(url_for('auth_bp.login'))
+@auth_bp.route('/send_verification_code', methods=['POST'])
+@login_required
+def send_verification_code():
+    verification_code = str(random.randint(100000, 999999))
+    session['verification_code'] = verification_code
+
+    msg = Message("Your Password Change Verification Code",
+                  sender=current_app.config['MAIL_USERNAME'],  # Use app context
+                  recipients=[current_user.email])
+    msg.body = f"Your verification code is: {verification_code}"
+
+    with current_app.app_context():
+        mail = current_app.extensions['mail']  # Access mail from app context
+        mail.send(msg)
+
+    flash("Verification code sent to your email.")
+    return redirect(url_for('auth_bp.profile'))
+
+@auth_bp.route('/verify_code', methods=['POST'])
+@login_required
+def verify_code():
+    user_code = request.form['verification_code']
+    if session.get('verification_code') == user_code:
+        session['password_change_allowed'] = True
+        flash("Verification successful. You can now change your password.")
+    else:
+        flash("Invalid verification code.")
+    return redirect(url_for('auth_bp.profile'))
+
+@auth_bp.route('/change_password', methods=['POST'])
+@login_required
+def change_password():
+    if not session.get('password_change_allowed'):
+        flash("Please verify your email before changing the password.")
+        return redirect(url_for('auth_bp.profile'))
+
+    new_password = request.form['new_password']
+    current_user.password_hash = generate_password_hash(new_password)
+    db.session.commit()
+    session.pop('password_change_allowed', None)
+    flash("Password changed successfully.")
+    return redirect(url_for('auth_bp.profile'))

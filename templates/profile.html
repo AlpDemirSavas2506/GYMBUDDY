@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Profile - GymBuddy{% endblock %}
+{% block content %}
+<h1>Your Profile</h1>
+<p>View and update your personal information here.</p>
+
+<div class="card">
+        <h5 class="card-title">{{ user.username }}</h5>
+        <p class="card-text"><strong>Name:</strong> {{ user.name }} {{ user.surname }}</p>
+        <p class="card-text"><strong>Email:</strong> {{ user.email }}</p>
+        <p class="card-text"><strong>Phone:</strong> {{ user.phone_number }}</p>
+        <p class="card-text"><strong>Emergency Contact:</strong> {{ user.emergency_contact_name }} ({{ user.emergency_contact_number }})</p>
+        <p class="card-text"><strong>Height:</strong> {{ user.height }} cm</p>
+        <p class="card-text"><strong>Weight:</strong> {{ user.weight }} kg</p>
+        <p class="card-text"><strong>Blood Type:</strong> {{ user.blood_type }}</p>
+    </div>
+<form method="POST" action="{{ url_for('auth_bp.send_verification_code') }}">
+    <button type="submit" class="btn btn-primary">Send Verification Code</button>
+</form>
+
+<form method="POST" action="{{ url_for('auth_bp.verify_code') }}">
+    <div>
+        <label>Enter Verification Code:</label>
+        <input type="text" name="verification_code" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Verify Code</button>
+</form>
+
+<form method="POST" action="{{ url_for('auth_bp.change_password') }}">
+    <div>
+        <label>New Password:</label>
+        <input type="password" name="new_password" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Change Password</button>
+</form>
+
+</div>
+
+<a href="{{ url_for('home') }}" class="btn btn-primary mt-3">Back to Home</a>
+{% endblock %}

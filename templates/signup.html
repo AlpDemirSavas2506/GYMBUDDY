@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - GymBuddy</title>
@@ -143,6 +144,33 @@
             }
         }
     </style>
+    <script>
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const email = document.querySelector('input[name="email"]').value;
+        const phoneNumber = document.querySelector('input[name="phone_number"]').value;
+
+        console.log("Validation triggered");
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            alert("Please enter a valid email address.");
+            e.preventDefault();
+            return;
+        }
+
+        // Phone number validation
+        const phoneRegex = /^0\(5\d{2}\)\d{7}$/;
+        if (!phoneRegex.test(phoneNumber)) {
+            alert("Phone number must be in the format: 0(5XX)XXXXXXX");
+            e.preventDefault();
+            return;
+        }
+    });
+</script>
+</script>
+
 </head>
 <body>
     <div class="signup-container">
@@ -162,10 +190,10 @@
                     {{ form.surname.label }}
                     {{ form.surname(class="form-control", placeholder="Enter your last name", required=True) }}
                 </div>
-                <div class="form-group">
-                    {{ form.email.label }}
-                    {{ form.email(class="form-control", placeholder="Enter your email", required=True) }}
-                </div>
+<div class="form-group">
+    {{ form.email.label }}
+    {{ form.email(class="form-control", placeholder="Enter your email", required=True) }}
+</div>
                 <div class="form-group">
                     {{ form.password.label }}
                     {{ form.password(class="form-control", placeholder="Enter a password", required=True) }}
@@ -186,10 +214,11 @@
                     {{ form.blood_type.label }}
                     {{ form.blood_type(class="form-control", placeholder="Enter your blood type") }}
                 </div>
-                <div class="form-group">
-                    {{ form.phone_number.label }}
-                    {{ form.phone_number(class="form-control", placeholder="Enter your phone number", required=True) }}
-                </div>
+<div class="form-group">
+    {{ form.phone_number.label }}
+    {{ form.phone_number(class="form-control", placeholder="0(5XX)XXXXXXX", required=True) }}
+</div>
+
                 <div class="form-group">
                     {{ form.emergency_contact_name.label }}
                     {{ form.emergency_contact_name(class="form-control", placeholder="Emergency contact name", required=True) }}

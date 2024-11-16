@@ -3,10 +3,13 @@ from random import randint  # Replace this
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash
-
 from app import mail
 from .forms import SignupForm, LoginForm, UpdateProfileForm
-from models import User, db
+from models import User, Reservation, Facility
+from flask import Blueprint, request, jsonify
+from flask_login import login_required, current_user
+from datetime import datetime, timedelta
+from models import db
 
 auth_bp = Blueprint('auth_bp', __name__)
 

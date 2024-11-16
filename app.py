@@ -2,7 +2,9 @@ from flask import Flask, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_mail import Mail
-from models import db, User
+
+from reservation.routes import reservation_bp
+from models import db, User, Facility
 from flask import render_template
 from flask_login import login_required, current_user
 from auth.forms import UpdateProfileForm
@@ -39,11 +41,6 @@ def create_app():
     def events():
         return render_template('events.html')
 
-    @app.route('/reservation')
-    @login_required
-    def reservation():
-        return render_template('reservation.html')
-
     @app.route('/forum')
     @login_required
     def forum():
@@ -62,6 +59,7 @@ def create_app():
     # Register blueprints
     from auth.routes import auth_bp
     app.register_blueprint(auth_bp)
+    app.register_blueprint(reservation_bp)
 
     # Define routes
     @app.route('/')
@@ -69,7 +67,6 @@ def create_app():
         return redirect(url_for('auth_bp.login'))
 
     return app
-
 
 if __name__ == '__main__':
     app = create_app()

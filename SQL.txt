@@ -1,3 +1,45 @@
+-- public.facilities definition
+
+-- Drop table
+
+-- DROP TABLE public.facilities;
+
+CREATE TABLE public.facilities (
+	id serial4 NOT NULL,
+	"name" varchar(100) NOT NULL,
+	CONSTRAINT facilities_name_key UNIQUE (name),
+	CONSTRAINT facilities_pkey PRIMARY KEY (id)
+);
+
+
+-- public.reservations definition
+
+-- Drop table
+
+-- DROP TABLE public.reservations;
+
+CREATE TABLE public.reservations (
+	id serial4 NOT NULL,
+	user_id int4 NOT NULL,
+	facility_id int4 NOT NULL,
+	start_time timestamp NOT NULL,
+	end_time timestamp NOT NULL,
+	CONSTRAINT reservations_pkey PRIMARY KEY (id),
+	CONSTRAINT reservations_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id) ON DELETE CASCADE,
+	CONSTRAINT reservations_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
+);
+
+-- Table Triggers
+
+create trigger check_overlap before
+insert
+    or
+update
+    on
+    public.reservations for each row execute function prevent_overlap();
+
+
+
 -- public.users definition
 
 -- Drop table

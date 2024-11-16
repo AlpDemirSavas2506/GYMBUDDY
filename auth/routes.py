@@ -1,7 +1,11 @@
+from random import randint  # Replace this
+
 from flask import Blueprint, render_template, redirect, url_for, flash
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash
-from .forms import SignupForm, LoginForm
+
+from app import mail
+from .forms import SignupForm, LoginForm, UpdateProfileForm
 from models import User, db
 
 auth_bp = Blueprint('auth_bp', __name__)
@@ -11,11 +15,17 @@ auth_bp = Blueprint('auth_bp', __name__)
 def signup():
     form = SignupForm()
     if form.validate_on_submit():
-        existing_user = User.query.filter_by(email=form.email.data).first()
-        if existing_user:
+        # Check for duplicate email
+        if User.query.filter_by(email=form.email.data).first():
             flash('Email already exists. Please log in.')
             return redirect(url_for('auth_bp.login'))
 
+        # Check for duplicate username
+        if User.query.filter_by(username=form.username.data).first():
+            flash('Username already exists. Please choose another one.')
+            return redirect(url_for('auth_bp.signup'))
+
+        # Create new user
         new_user = User(
             username=form.username.data,
             name=form.name.data,
@@ -28,11 +38,14 @@ def signup():
             weight=form.weight.data,
             blood_type=form.blood_type.data
         )
+        # Set password
         new_user.set_password(form.password.data)
+
         db.session.add(new_user)
         db.session.commit()
         flash('Account created successfully! Please log in.')
         return redirect(url_for('auth_bp.login'))
+
     return render_template('signup.html', form=form)
 
 
@@ -56,45 +69,101 @@ def logout():
     logout_user()
     flash('You have been logged out.')
     return redirect(url_for('auth_bp.login'))
-@auth_bp.route('/send_verification_code', methods=['POST'])
+
+
+from flask_mail import Message
+from flask import request, session, current_app
+
+
+@auth_bp.route('/profile', methods=['GET', 'POST'])
 @login_required
-def send_verification_code():
-    verification_code = str(random.randint(100000, 999999))
-    session['verification_code'] = verification_code
+def profile():
+    form = UpdateProfileForm(obj=current_user)
 
-    msg = Message("Your Password Change Verification Code",
-                  sender=current_app.config['MAIL_USERNAME'],  # Use app context
-                  recipients=[current_user.email])
-    msg.body = f"Your verification code is: {verification_code}"
-
-    with current_app.app_context():
-        mail = current_app.extensions['mail']  # Access mail from app context
-        mail.send(msg)
-
-    flash("Verification code sent to your email.")
-    return redirect(url_for('auth_bp.profile'))
-
-@auth_bp.route('/verify_code', methods=['POST'])
-@login_required
-def verify_code():
-    user_code = request.form['verification_code']
-    if session.get('verification_code') == user_code:
-        session['password_change_allowed'] = True
-        flash("Verification successful. You can now change your password.")
-    else:
-        flash("Invalid verification code.")
-    return redirect(url_for('auth_bp.profile'))
-
-@auth_bp.route('/change_password', methods=['POST'])
-@login_required
-def change_password():
-    if not session.get('password_change_allowed'):
-        flash("Please verify your email before changing the password.")
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.name = form.name.data
+        current_user.surname = form.surname.data
+        current_user.email = form.email.data
+        current_user.phone_number = form.phone_number.data
+        current_user.emergency_contact_name = form.emergency_contact_name.data
+        current_user.emergency_contact_number = form.emergency_contact_number.data
+        current_user.height = form.height.data
+        current_user.weight = form.weight.data
+        current_user.blood_type = form.blood_type.data
+        db.session.commit()
+        flash("Profile updated successfully!", "success")
         return redirect(url_for('auth_bp.profile'))
 
-    new_password = request.form['new_password']
-    current_user.password_hash = generate_password_hash(new_password)
+    if request.method == 'POST':
+        if request.form.get('action') == 'send_verification_code':
+            verification_code = str(randint(100000, 999999))
+            session['verification_code'] = verification_code
+
+            msg = Message(
+                "Your Email Verification Code",
+                sender=current_app.config['MAIL_USERNAME'],
+                recipients=[current_user.email]
+            )
+            msg.body = f"Your verification code is: {verification_code}"
+            with current_app.app_context():
+                mail.send(msg)
+            flash("Verification code sent to your email.", "info")
+
+        elif request.form.get('action') == 'verify_code':
+            entered_code = request.form.get('verification_code')
+            if entered_code == session.get('verification_code'):
+                flash("Verification successful!", "success")
+                session.pop('verification_code', None)  # Remove the code after verification
+            else:
+                flash("Invalid verification code. Please try again.", "danger")
+
+    return render_template('profile.html', user=current_user, form=form)
+
+from flask import jsonify
+
+@auth_bp.route('/send-verification-code', methods=['POST'])
+@login_required
+def send_verification_code():
+    verification_code = str(randint(100000, 999999))
+    session['verification_code'] = verification_code
+
+    msg = Message(
+        "Your Email Verification Code",
+        sender=current_app.config['MAIL_USERNAME'],
+        recipients=[current_user.email]
+    )
+    msg.body = f"Your verification code is: {verification_code}"
+
+    try:
+        with current_app.app_context():
+            mail.send(msg)
+        return jsonify(success=True)
+    except Exception as e:
+        print(e)
+        return jsonify(success=False)
+
+
+@auth_bp.route('/verify-code', methods=['POST'])
+@login_required
+def verify_code():
+    data = request.get_json()
+    entered_code = data.get('code')
+    if entered_code == session.get('verification_code'):
+        session.pop('verification_code', None)
+        return jsonify(success=True)
+    return jsonify(success=False)
+
+
+@auth_bp.route('/change-password', methods=['POST'])
+@login_required
+def change_password():
+    data = request.get_json()
+    new_password = data.get('password')
+
+    if not new_password:
+        return jsonify(success=False)
+
+    current_user.set_password(new_password)
     db.session.commit()
-    session.pop('password_change_allowed', None)
-    flash("Password changed successfully.")
-    return redirect(url_for('auth_bp.profile'))
+    return jsonify(success=True)

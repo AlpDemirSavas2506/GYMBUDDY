@@ -5,6 +5,8 @@ from flask_mail import Mail
 from models import db, User
 from flask import render_template
 from flask_login import login_required, current_user
+from auth.forms import UpdateProfileForm
+
 mail = Mail()  # Initialize mail globally
 
 
@@ -47,11 +49,12 @@ def create_app():
     def forum():
         return render_template('forum.html')
 
+
     @app.route('/profile')
     @login_required
     def profile():
-        return render_template('profile.html', user=current_user)
-
+        form = UpdateProfileForm(obj=current_user)
+        return render_template('profile.html', user=current_user, form=form)
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))

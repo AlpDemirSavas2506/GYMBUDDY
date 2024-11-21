@@ -230,3 +230,4 @@ def forgot_password():
         flash("Email not found. Please check and try again.", "danger")
 
     return render_template('forgot_password.html')
+

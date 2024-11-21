@@ -1,6 +1,99 @@
 {% extends "base.html" %}
 {% block title %}Home - GymBuddy{% endblock %}
 {% block content %}
-<h1>Welcome to the Home Page</h1>
-<p>This is the home page of GymBuddy.</p>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - GymBuddy</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f7fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .list li {
+            background-color: #f9f9f9;
+            margin-bottom: 10px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .list li:nth-child(odd) {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Kullanıcıya Özgü Karşılama Mesajı -->
+        <div class="section">
+            <h1>Welcome, {{ current_user.name }}!</h1>
+            <p class="welcome-message">Here are your reservations:</p>
+        </div>
+
+        <!-- Yaklaşan Rezervasyonlar -->
+        <div class="section">
+            <h2>Upcoming Reservations</h2>
+            {% if upcoming_reservations %}
+            <ul class="list">
+                {% for reservation in upcoming_reservations %}
+                <li>
+                    <strong>{{ reservation.facility.name }}</strong><br>
+                    {{ reservation.start_time.strftime('%d %b %Y, %I:%M %p') }} - {{ reservation.end_time.strftime('%I:%M %p') }}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>You don't have any upcoming reservations.</p>
+            {% endif %}
+        </div>
+
+        <!-- Geçmiş Rezervasyonlar -->
+        <div class="section">
+            <h2>Past Reservations</h2>
+            {% if past_reservations %}
+            <ul class="list">
+                {% for reservation in past_reservations %}
+                <li>
+                    <strong>{{ reservation.facility.name }}</strong><br>
+                    {{ reservation.start_time.strftime('%d %b %Y, %I:%M %p') }} - {{ reservation.end_time.strftime('%I:%M %p') }}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>You don't have any past reservations.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
+
 {% endblock %}

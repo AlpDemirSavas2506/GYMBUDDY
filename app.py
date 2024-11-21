@@ -1,14 +1,11 @@
-from flask import Flask, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
 from flask_login import LoginManager
-from flask_mail import Mail
-
 from reservation.routes import reservation_bp
-from models import db, User, Facility
-from flask import render_template
-from flask_login import login_required, current_user
+from models import db, User
+from flask_login import login_required
 from auth.forms import UpdateProfileForm
 from config import mail
+from datetime import datetime
 
 
 
@@ -34,8 +31,21 @@ def create_app():
     @app.route('/home')
     @login_required
     def home():
-        return render_template('home.html')
+        today = datetime.now()
 
+        # Rezervasyonları tarihine göre ayır
+        upcoming_reservations = [
+            reservation for reservation in current_user.reservations if reservation.start_time >= today
+        ]
+        past_reservations = [
+            reservation for reservation in current_user.reservations if reservation.start_time < today
+        ]
+
+        return render_template(
+            'home.html',
+            upcoming_reservations=upcoming_reservations,
+            past_reservations=past_reservations,
+        )
     @app.route('/events')
     @login_required
     def events():

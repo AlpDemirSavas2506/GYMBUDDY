@@ -1,86 +1,185 @@
 {% extends "base.html" %}
 {% block title %}Profile - GymBuddy{% endblock %}
 {% block content %}
-<h1>Your Profile</h1>
-<p>View and update your personal information here.</p>
+<div class="profile-container">
+    <h1 class="profile-heading">Your Profile</h1>
+    <p class="profile-subheading">Manage and update your personal information below.</p>
 
-<!-- Profile Update Form -->
-<form id="profile-form" method="POST">
-    {{ form.hidden_tag() }}
-    <div class="form-group">
-        {{ form.username.label }}
-        {{ form.username(class="form-control") }}
+    <!-- Profile Update Section -->
+    <div class="profile-card">
+        <form id="profile-form" method="POST">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                <label for="username"><i class="fas fa-user"></i> Username</label>
+                {{ form.username(class="form-control", id="username") }}
+            </div>
+            <div class="form-group">
+                <label for="name"><i class="fas fa-id-badge"></i> First Name</label>
+                {{ form.name(class="form-control", id="name") }}
+            </div>
+            <div class="form-group">
+                <label for="surname"><i class="fas fa-id-badge"></i> Last Name</label>
+                {{ form.surname(class="form-control", id="surname") }}
+            </div>
+            <div class="form-group">
+                <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                {{ form.email(class="form-control", id="email") }}
+            </div>
+            <div class="form-group">
+                <label for="phone"><i class="fas fa-phone"></i> Phone Number</label>
+                {{ form.phone_number(class="form-control", id="phone") }}
+            </div>
+            <div class="form-group">
+                <label for="emergency_name"><i class="fas fa-user-shield"></i> Emergency Contact Name</label>
+                {{ form.emergency_contact_name(class="form-control", id="emergency_name") }}
+            </div>
+            <div class="form-group">
+                <label for="emergency_number"><i class="fas fa-phone-alt"></i> Emergency Contact Number</label>
+                {{ form.emergency_contact_number(class="form-control", id="emergency_number") }}
+            </div>
+            <div class="form-group">
+                <label for="height"><i class="fas fa-ruler"></i> Height (cm)</label>
+                {{ form.height(class="form-control", id="height") }}
+            </div>
+            <div class="form-group">
+                <label for="weight"><i class="fas fa-weight"></i> Weight (kg)</label>
+                {{ form.weight(class="form-control", id="weight") }}
+            </div>
+            <div class="form-group">
+                <label for="blood"><i class="fas fa-tint"></i> Blood Type</label>
+                {{ form.blood_type(class="form-control", id="blood") }}
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Update Profile</button>
+        </form>
     </div>
-    <div class="form-group">
-        {{ form.name.label }}
-        {{ form.name(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.surname.label }}
-        {{ form.surname(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.email.label }}
-        {{ form.email(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.phone_number.label }}
-        {{ form.phone_number(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.emergency_contact_name.label }}
-        {{ form.emergency_contact_name(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.emergency_contact_number.label }}
-        {{ form.emergency_contact_number(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.height.label }}
-        {{ form.height(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.weight.label }}
-        {{ form.weight(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.blood_type.label }}
-        {{ form.blood_type(class="form-control") }}
-    </div>
-    <button type="submit" class="btn btn-primary">Update Profile</button>
-</form>
 
-<hr>
-
-<!-- Verification Code Section -->
-<h2>Email Verification</h2>
-<p>If you need to verify your email, send a verification code and enter it below.</p>
-
-<!-- Send Verification Code Form -->
-<button id="send-code-btn" class="btn btn-secondary">Send Verification Code</button>
-
-<!-- Verification Code Input -->
-<div id="verification-section" class="mt-3" style="display: none;">
-    <div class="form-group">
-        <label for="verification_code">Enter Verification Code</label>
-        <input type="text" id="verification_code" class="form-control" placeholder="Enter the code sent to your email">
+    <!-- Verification Code Section -->
+    <div class="profile-card mt-4">
+        <h2>Email Verification</h2>
+        <p>If you need to verify your email, send a verification code and enter it below.</p>
+        <button id="send-code-btn" class="btn btn-secondary">Send Verification Code</button>
+        <div id="verification-section" class="mt-3" style="display: none;">
+            <div class="form-group">
+                <label for="verification_code">Enter Verification Code</label>
+                <input type="text" id="verification_code" class="form-control" placeholder="Enter the code sent to your email">
+            </div>
+            <button id="verify-code-btn" class="btn btn-primary">Verify Code</button>
+        </div>
     </div>
-    <button id="verify-code-btn" class="btn btn-primary">Verify Code</button>
+
+    <!-- Password Update Section -->
+    <div class="profile-card mt-4" id="password-section" style="display: none;">
+        <h3>Change Your Password</h3>
+        <div class="form-group">
+            <label for="new_password">New Password</label>
+            <input type="password" id="new_password" class="form-control" placeholder="Enter your new password">
+        </div>
+        <div class="form-group">
+            <label for="confirm_password">Confirm New Password</label>
+            <input type="password" id="confirm_password" class="form-control" placeholder="Confirm your new password">
+        </div>
+        <button id="change-password-btn" class="btn btn-success">Change Password</button>
+    </div>
 </div>
 
-<!-- Password Update Section -->
-<div id="password-section" class="mt-3" style="display: none;">
-    <h3>Change Your Password</h3>
-    <div class="form-group">
-        <label for="new_password">New Password</label>
-        <input type="password" id="new_password" class="form-control" placeholder="Enter your new password">
-    </div>
-    <div class="form-group">
-        <label for="confirm_password">Confirm New Password</label>
-        <input type="password" id="confirm_password" class="form-control" placeholder="Confirm your new password">
-    </div>
-    <button id="change-password-btn" class="btn btn-success">Change Password</button>
-</div>
+<style>
+    /* Add shared styling from the earlier version */
+    body {
+        background-color: #f9f9f9;
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .profile-container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+    }
+
+    .profile-heading {
+        text-align: center;
+        font-size: 32px;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .profile-subheading {
+        text-align: center;
+        font-size: 16px;
+        margin-bottom: 30px;
+        color: #666;
+    }
+
+    .profile-card {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        font-weight: 500;
+        color: #555;
+        margin-bottom: 5px;
+        display: block;
+        font-size: 14px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 15px;
+        background-color: #f9f9f9;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        background-color: #fff;
+        box-shadow: 0 0 6px rgba(0, 123, 255, 0.2);
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        color: white;
+        background-color: #007bff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+    }
+
+    .btn:hover {
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+    }
+
+    .mt-3 {
+        margin-top: 20px;
+    }
+
+    .mt-4 {
+        margin-top: 30px;
+    }
+</style>
 
 <script>
     document.getElementById('send-code-btn').addEventListener('click', function () {
@@ -114,26 +213,32 @@
         });
     });
 
-    document.getElementById('change-password-btn').addEventListener('click', function () {
-        const newPassword = document.getElementById('new_password').value;
-        const confirmPassword = document.getElementById('confirm_password').value;
+document.getElementById('change-password-btn').addEventListener('click', function () {
+    const newPassword = document.getElementById('new_password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
 
-        if (newPassword !== confirmPassword) {
-            alert("Passwords do not match!");
-            return;
+    if (newPassword !== confirmPassword) {
+        alert("Passwords do not match!");
+        return;
+    }
+
+    fetch('/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: newPassword })
+    }).then(response => response.json()).then(data => {
+        if (data.success) {
+            alert("Password updated successfully!");
+            // Reload the page after successful password update
+            location.reload();
+        } else {
+            alert("Failed to update password. Try again.");
         }
-
-        fetch('/change-password', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password: newPassword })
-        }).then(response => response.json()).then(data => {
-            if (data.success) {
-                alert("Password updated successfully!");
-            } else {
-                alert("Failed to update password. Try again.");
-            }
-        });
+    }).catch(error => {
+        console.error("Error updating password:", error);
+        alert("An error occurred. Please try again.");
     });
+});
+
 </script>
 {% endblock %}

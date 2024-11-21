@@ -29,7 +29,13 @@ class SignupForm(FlaskForm):
     height = FloatField('Height', validators=[Optional()])
     weight = FloatField('Weight', validators=[Optional()])
     blood_type = StringField('Blood Type', validators=[Optional()])
-    phone_number = StringField('Phone Number', validators=[DataRequired()])
+    phone_number = StringField(
+        'Phone Number',
+        validators=[
+            DataRequired(),
+            Regexp(r'^\d+$', message="Phone number must contain only digits.")
+        ]
+    )
     emergency_contact_name = StringField('Emergency Contact Name', validators=[DataRequired()])
     emergency_contact_number = StringField('Emergency Contact Number', validators=[DataRequired()])
     submit = SubmitField('Sign Up')

@@ -48,8 +48,17 @@ class UpdateProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     name = StringField('Name', validators=[DataRequired()])
     surname = StringField('Surname', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    phone_number = StringField('Phone Number', validators=[DataRequired()])
+    email = StringField(
+        'Email',
+        validators=[DataRequired(), Email(message="Please enter a valid email address.")]
+    )
+    phone_number = StringField(
+        'Phone Number',
+        validators=[
+            DataRequired(),
+            Regexp(r'^\d+$', message="Phone number must contain only digits.")
+        ]
+    )
     emergency_contact_name = StringField('Emergency Contact Name', validators=[DataRequired()])
     emergency_contact_number = StringField('Emergency Contact Number', validators=[DataRequired()])
     height = FloatField('Height', validators=[Optional()])

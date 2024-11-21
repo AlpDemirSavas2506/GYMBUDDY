@@ -144,32 +144,29 @@
             }
         }
     </style>
-    <script>
 <script>
+document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('form').addEventListener('submit', function(e) {
         const email = document.querySelector('input[name="email"]').value;
         const phoneNumber = document.querySelector('input[name="phone_number"]').value;
 
-        console.log("Validation triggered");
-
-        // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const phoneRegex = /^\d+$/;
+
         if (!emailRegex.test(email)) {
             alert("Please enter a valid email address.");
             e.preventDefault();
             return;
         }
 
-        // Phone number validation
-        const phoneRegex = /^0\(5\d{2}\)\d{7}$/;
         if (!phoneRegex.test(phoneNumber)) {
-            alert("Phone number must be in the format: 0(5XX)XXXXXXX");
+            alert("Phone number must contain only digits.");
             e.preventDefault();
-            return;
         }
     });
+});
 </script>
-</script>
+
 
 </head>
 <body>

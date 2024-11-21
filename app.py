@@ -61,12 +61,25 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(reservation_bp)
 
+    @app.errorhandler(404)
+    def page_not_found(e):
+        # Check if the user is authenticated
+        if current_user.is_authenticated:
+            logout_user()
+            return redirect(url_for('auth_bp.login'))
+        else:
+            # For non-authenticated users, redirect to login with a message
+            return redirect(url_for('auth_bp.login'))
+
     # Define routes
     @app.route('/')
     def index():
         return redirect(url_for('auth_bp.login'))
 
     return app
+from flask import render_template, redirect, url_for
+from flask_login import logout_user, current_user
+
 
 if __name__ == '__main__':
     app = create_app()

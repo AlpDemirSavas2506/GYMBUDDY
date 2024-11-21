@@ -170,3 +170,63 @@ def change_password():
     current_user.set_password(new_password)
     db.session.commit()
     return jsonify(success=True)
+
+@auth_bp.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    if request.method == 'POST':
+        verification_code = request.form.get('verification_code')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+
+        if verification_code != session.get('verification_code'):
+            flash("Invalid verification code.", "danger")
+            return redirect(url_for('auth_bp.reset_password'))
+
+        if new_password != confirm_password:
+            flash("Passwords do not match.", "danger")
+            return redirect(url_for('auth_bp.reset_password'))
+
+        email = session.get('reset_email')
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            user.set_password(new_password)
+            db.session.commit()
+            session.pop('reset_email', None)
+            session.pop('verification_code', None)
+            flash("Password reset successful. You can now log in.", "success")
+            return redirect(url_for('auth_bp.login'))
+
+        flash("Something went wrong. Please try again.", "danger")
+
+    return render_template('reset_password.html')
+from flask_mail import Message
+from random import randint
+
+@auth_bp.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            # Generate a verification code
+            verification_code = str(randint(100000, 999999))
+            session['reset_email'] = email
+            session['verification_code'] = verification_code
+
+            # Send email with verification code
+            msg = Message(
+                "Password Reset Verification Code",
+                sender=current_app.config['MAIL_USERNAME'],
+                recipients=[email]
+            )
+            msg.body = f"Your password reset verification code is: {verification_code}"
+            mail.send(msg)
+
+            flash("A verification code has been sent to your email.", "info")
+            return redirect(url_for('auth_bp.reset_password'))
+
+        flash("Email not found. Please check and try again.", "danger")
+
+    return render_template('forgot_password.html')

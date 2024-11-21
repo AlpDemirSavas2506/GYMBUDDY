@@ -163,6 +163,15 @@
 </style>
 
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const dateInput = document.getElementById('date');
+
+        // Trigger calendar on any part of the date input field
+        dateInput.addEventListener('click', () => {
+            dateInput.showPicker(); // Opens the calendar picker
+        });
+    });
+
     document.getElementById('fetch-slots').addEventListener('click', async () => {
         const facilityId = document.getElementById('facility').value;
         const date = document.getElementById('date').value;

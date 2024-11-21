@@ -8,8 +8,8 @@ from models import db, User, Facility
 from flask import render_template
 from flask_login import login_required, current_user
 from auth.forms import UpdateProfileForm
+from config import mail
 
-mail = Mail()  # Initialize mail globally
 
 
 def create_app():
@@ -54,7 +54,7 @@ def create_app():
         return render_template('profile.html', user=current_user, form=form)
     @login_manager.user_loader
     def load_user(user_id):
-        return User.query.get(int(user_id))
+        return db.session.get(User, int(user_id))
 
     # Register blueprints
     from auth.routes import auth_bp

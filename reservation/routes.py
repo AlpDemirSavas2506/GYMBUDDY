@@ -1,12 +1,10 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
-from models import User, Reservation, Facility
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from models import User, Reservation, Facility, db
 from flask_login import login_required, current_user
 from datetime import datetime, timedelta
-from models import db
+from utility import send_email
 
 reservation_bp = Blueprint('reservation_bp', __name__)
-
 
 @reservation_bp.route('/reservation', methods=['GET', 'POST'])
 @login_required
@@ -21,9 +19,43 @@ def reservation():
             date_obj = datetime.strptime(date, '%Y-%m-%d')
             opening_time = datetime.combine(date_obj, datetime.strptime("08:00", "%H:%M").time())
             closing_time = datetime.combine(date_obj, datetime.strptime("22:00", "%H:%M").time())
-            slot_duration = timedelta(minutes=30)
 
-            # Fetch existing reservations
+            # Facility lists for different intervals
+            one_hour_facilities = [
+                "1 Nolu Açık Tenis Kortu (Merkez Tenis Kortları)",
+                "1 Nolu Tenis Kortu (Büyük Spor Salonu)",
+                "2 Nolu Açık Tenis Kortu (Merkez Tenis Kortları)",
+                "2 Nolu Tenis Kortu (Büyük Spor Salonu)",
+                "3 Nolu Açık Tenis Kortu (Merkez Tenis Kortları)",
+                "3 Nolu Tenis Kortu (Büyük Spor Salonu)",
+                "4 Nolu Kapalı Tenis Kortu (Merkez Tenis Kortları)",
+                "5 Nolu Kapalı Tenis Kortu (Merkez Tenis Kortları)",
+                "Açık Toprak Kort (Merkez Tenis Kortları)",
+                "Baraka Spor Salonu - Ana Salon (Voleybol)",
+                "Baraka Spor Salonu - Ana Salon (Basketbol)",
+                "Halı Saha1",
+                "Halı Saha2",
+                "Halı Saha3",
+                "1 Nolu Kapalı Tenis Kortu (Merkez Tenis Kortları)",
+                "2 Nolu Kapalı Tenis Kortu (Merkez Tenis Kortları)",
+            ]
+
+            forty_minute_facilities = [
+                "Baraka Spor Salonu - Fitness Salonu",
+                "Baraka Spor Salonu - Minder Sporları Salonu",
+                "Baraka Spor Salonu - Aynalı Salon",
+                "Baraka Spor Salonu Stadyum",
+                "ODTÜKENT Spor Merkezi- Squash Kortu 1",
+                "ODTÜKENT Spor Merkezi- Squash Kortu 2",
+            ]
+
+            # Determine slot duration based on facility
+            slot_duration = timedelta(minutes=60)  # Default to 1-hour slots
+            facility = Facility.query.get(facility_id)
+            if facility.name in forty_minute_facilities:
+                slot_duration = timedelta(minutes=40)  # 40-minute slots for specific facilities
+
+            # Fetch existing reservations with eager loading
             existing_reservations = Reservation.query.filter(
                 Reservation.facility_id == facility_id,
                 Reservation.start_time >= opening_time,
@@ -34,8 +66,9 @@ def reservation():
             reserved_slots = []
             for res in existing_reservations:
                 reserved_slots.append({
-                    'start_time': res.start_time,
-                    'end_time': res.end_time,
+                    'id': res.id,
+                    'start_time': res.start_time.isoformat(),
+                    'end_time': res.end_time.isoformat(),
                     'username': res.user.username
                 })
 
@@ -44,15 +77,15 @@ def reservation():
             current_time = opening_time
             while current_time < closing_time:
                 next_time = current_time + slot_duration
-                # Check if this time overlaps with any reserved slot
                 overlapping_reservation = next(
                     (res for res in reserved_slots
-                     if res['start_time'] < next_time and res['end_time'] > current_time),
+                     if res['start_time'] < next_time.isoformat() and res['end_time'] > current_time.isoformat()),
                     None
                 )
 
                 if overlapping_reservation:
                     slots.append({
+                        'reservation_id': overlapping_reservation['id'],
                         'start_time': current_time.isoformat(),
                         'end_time': next_time.isoformat(),
                         'available': False,
@@ -73,39 +106,65 @@ def reservation():
 
     elif request.method == 'POST':
         data = request.get_json()
+        operation = data.get('operation')  # Check if it's a cancel operation
         facility_id = data.get('facility_id')
         start_time = data.get('start_time')
         end_time = data.get('end_time')
+        reservation_id = data.get('reservation_id')  # For cancellation
 
-        if not facility_id or not start_time or not end_time:
-            flash('Please fill in all fields', 'danger')
-            return jsonify(success=False)
+        if operation == 'cancel':
+            reservation = Reservation.query.filter_by(id=reservation_id, user_id=current_user.id).first()
+            if not reservation:
+                return jsonify({'error': 'You can only cancel your own reservations.'}), 403
 
-        try:
-            start_time = datetime.fromisoformat(start_time)
-            end_time = datetime.fromisoformat(end_time)
+            try:
+                db.session.delete(reservation)
+                db.session.commit()
 
-            # Check for conflicts
-            conflicting_reservation = Reservation.query.filter(
-                Reservation.facility_id == facility_id,
-                Reservation.start_time < end_time,
-                Reservation.end_time > start_time
-            ).first()
+                send_email(
+                    subject="Reservation Cancellation Confirmation",
+                    recipient=current_user.email,
+                    body=f"Your reservation has been canceled successfully."
+                )
 
-            if conflicting_reservation:
-                flash('The selected time slot is already booked', 'danger')
-                return jsonify(success=False)
+                return jsonify(success=True)
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
 
-            # Save reservation
-            new_reservation = Reservation(
-                user_id=current_user.id,
-                facility_id=facility_id,
-                start_time=start_time,
-                end_time=end_time
-            )
-            db.session.add(new_reservation)
-            db.session.commit()
-            return jsonify(success=True)
+        elif operation == 'create':
+            if not facility_id or not start_time or not end_time:
+                return jsonify({'error': 'Please provide all required details.'}), 400
 
-        except Exception as e:
-            return jsonify({'error': str(e)}), 500
+            try:
+                start_time = datetime.fromisoformat(start_time)
+                end_time = datetime.fromisoformat(end_time)
+
+                conflicting_reservation = Reservation.query.filter(
+                    Reservation.facility_id == facility_id,
+                    Reservation.start_time < end_time,
+                    Reservation.end_time > start_time
+                ).first()
+
+                if conflicting_reservation:
+                    return jsonify({'error': 'The selected time slot is already booked.'}), 400
+
+                new_reservation = Reservation(
+                    user_id=current_user.id,
+                    facility_id=facility_id,
+                    start_time=start_time,
+                    end_time=end_time
+                )
+                db.session.add(new_reservation)
+                db.session.commit()
+
+                send_email(
+                    subject="Reservation Confirmation",
+                    recipient=current_user.email,
+                    body=f"Your reservation has been confirmed successfully."
+                )
+
+                return jsonify(success=True)
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+
+        return jsonify(success=False)

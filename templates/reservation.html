@@ -6,7 +6,7 @@
     <p>Select a facility and a date to view available slots.</p>
 
     <!-- Facility and Date Selection Form -->
-    <form id="reservation-form" method="POST">
+    <form id="reservation-form" method="POST" class="reservation-form">
         <div class="form-group">
             <label for="facility">Facility:</label>
             <select id="facility" name="facility_id" class="form-control" required>
@@ -22,12 +22,11 @@
             <input type="date" id="date" name="date" class="form-control" required>
         </div>
 
-        <button type="button" id="fetch-slots" class="btn btn-primary">View Available Slots</button>
+        <button type="button" id="fetch-slots" class="btn btn-primary btn-block">View Available Slots</button>
     </form>
 
-    <!-- Available Slots -->
-    <div id="slots-container" style="display: none;">
-        <h2>Available Time Slots</h2>
+     <div id="slots-container" style="display: none; margin-top: 20px;">
+        <h2 class="slots-heading">Available Time Slots</h2>
         <div id="slots" class="slots-grid">
             <!-- Slots will be dynamically loaded here -->
         </div>
@@ -35,7 +34,87 @@
 </div>
 
 <style>
-/* General grid layout */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+    }
+
+    .reservation-container {
+        background-color: white;
+        border-radius: 10px;
+        padding: 20px;
+        max-width: 600px;
+        margin: 40px auto;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .heading {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-align: center;
+        color: #333;
+    }
+
+    p {
+        font-size: 16px;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #666;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 5px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 14px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 6px rgba(0, 123, 255, 0.2);
+        outline: none;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 12px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        color: white;
+        background-color: #007bff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .btn:hover {
+        background-color: #0056b3;
+        box-shadow: 0 4px 10px rgba(0, 91, 179, 0.2);
+    }
+
+    .btn-block {
+        display: block;
+    }
+    /* General grid layout */
 .slots-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -66,7 +145,7 @@
     background-color: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
-    pointer-events: none; /* Make unavailable slots unclickable */
+    pointer-events: auto; /* Make unavailable slots unclickable */
 }
 
 /* Hover effect */
@@ -84,66 +163,95 @@
 </style>
 
 <script>
-document.getElementById('fetch-slots').addEventListener('click', async () => {
-    const facilityId = document.getElementById('facility').value;
-    const date = document.getElementById('date').value;
+    document.getElementById('fetch-slots').addEventListener('click', async () => {
+        const facilityId = document.getElementById('facility').value;
+        const date = document.getElementById('date').value;
 
-    if (!facilityId || !date) {
-        alert("Please select a facility and a date.");
-        return;
-    }
-
-    const response = await fetch(`/reservation?facility_id=${facilityId}&date=${date}`);
-    const data = await response.json();
-
-    const slotsContainer = document.getElementById('slots-container');
-    const slotsGrid = document.getElementById('slots');
-    slotsGrid.innerHTML = ''; // Clear existing slots
-
-    if (data.available_slots && data.available_slots.length > 0) {
-        slotsContainer.style.display = 'block';
-
-        data.available_slots.forEach(slot => {
-            const div = document.createElement('div');
-            div.className = `slot ${slot.available ? 'available' : 'unavailable'}`;
-            div.textContent = `${new Date(slot.start_time).toLocaleTimeString()} - ${new Date(slot.end_time).toLocaleTimeString()}`;
-
-            // Add username if the slot is unavailable
-            if (!slot.available && slot.username) {
-                const usernameDiv = document.createElement('div');
-                usernameDiv.className = 'username';
-                usernameDiv.textContent = `Reserved by: ${slot.username}`;
-                div.appendChild(usernameDiv);
-            }
-
-            // Make available slots clickable
-            if (slot.available) {
-                div.onclick = () => reserveSlot(facilityId, slot.start_time, slot.end_time);
-            }
-
-            slotsGrid.appendChild(div);
-        });
-    } else {
-        slotsGrid.innerHTML = '<p>No available slots found.</p>';
-    }
-});
-
-async function reserveSlot(facilityId, startTime, endTime) {
-    const confirmReservation = confirm(`Do you want to reserve this slot?`);
-    if (confirmReservation) {
-        const response = await fetch('/reservation', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ facility_id: facilityId, start_time: startTime, end_time: endTime })
-        });
-
-        if (response.ok) {
-            alert("Reservation successful!");
-            location.reload();
-        } else {
-            alert("Failed to reserve slot.");
+        if (!facilityId || !date) {
+            alert("Please select a facility and a date.");
+            return;
         }
-    }
-}
+
+        try {
+            const response = await fetch(`/reservation?facility_id=${facilityId}&date=${date}`);
+            if (!response.ok) throw new Error("Failed to fetch available slots.");
+
+            const data = await response.json();
+            const slotsContainer = document.getElementById('slots-container');
+            const slotsGrid = document.getElementById('slots');
+            slotsGrid.innerHTML = ''; // Clear existing slots
+
+            if (data.available_slots && data.available_slots.length > 0) {
+                slotsContainer.style.display = 'block';
+                data.available_slots.forEach(slot => {
+                    const div = document.createElement('div');
+                    div.className = `slot ${slot.available ? 'available' : 'unavailable'}`;
+                    div.textContent = `${new Date(slot.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(slot.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
+                    if (!slot.available) {
+                        const usernameDiv = document.createElement('div');
+                        usernameDiv.className = 'username';
+                        usernameDiv.textContent = `Reserved by: ${slot.username}`;
+                        div.appendChild(usernameDiv);
+
+                        if (slot.username === "{{ current_user.username }}") {
+                            const cancelButton = document.createElement('button');
+                            cancelButton.textContent = 'Cancel';
+                            cancelButton.className = 'btn btn-danger';
+                            cancelButton.addEventListener('click', async (e) => {
+                                e.stopPropagation(); // Prevent the parent slot click event
+                                if (confirm("Are you sure you want to cancel this reservation?")) {
+                                    const cancelResponse = await fetch('/reservation', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ operation: 'cancel', reservation_id: slot.reservation_id })
+                                    });
+                                    if (cancelResponse.ok) {
+                                        alert('Reservation canceled!');
+                                        document.getElementById('fetch-slots').click(); // Refresh slots
+                                    } else {
+                                        alert('Failed to cancel reservation.');
+                                    }
+                                }
+                            });
+                            div.appendChild(cancelButton);
+                        }
+                    } else {
+                        div.addEventListener('click', async () => {
+                            if (confirm("Do you want to reserve this slot?")) {
+                                const reserveResponse = await fetch('/reservation', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        operation: 'create',
+                                        facility_id: facilityId,
+                                        start_time: slot.start_time,
+                                        end_time: slot.end_time
+                                    })
+                                });
+                                if (reserveResponse.ok) {
+                                    alert('Reservation successful!');
+                                    document.getElementById('fetch-slots').click(); // Refresh slots
+                                } else {
+                                    const error = await reserveResponse.json();
+                                    alert(`Failed to reserve slot: ${error.error || 'Unknown error'}`);
+                                }
+                            }
+                        });
+                    }
+
+                    slotsGrid.appendChild(div);
+                });
+            } else {
+                slotsContainer.style.display = 'block';
+                slotsGrid.innerHTML = '<p>No available slots found for the selected date and facility.</p>';
+            }
+        } catch (error) {
+            console.error(error);
+            alert("An error occurred while fetching slots. Please try again.");
+        }
+    });
 </script>
+
+
 {% endblock %}

@@ -9,7 +9,11 @@ class SignupForm(FlaskForm):
     surname = StringField('Surname', validators=[DataRequired()])
     email = StringField(
         'Email',
-        validators=[DataRequired(), Email(message="Please enter a valid email address.")]
+        validators=[
+            DataRequired(),
+            Email(message="Please enter a valid email address."),
+            Regexp(r".+@metu\.edu\.tr$", message="Email must be a valid METU address (e.g., example@metu.edu.tr).")
+        ]
     )
     password = PasswordField(
         'Password',

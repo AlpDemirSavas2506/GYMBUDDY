@@ -17,54 +17,48 @@ auth_bp = Blueprint('auth_bp', __name__)
 @auth_bp.route('/signup', methods=['GET', 'POST'])
 def signup():
     form = SignupForm()
+    error_message = None
     if form.validate_on_submit():
-        # Check for duplicate email
-        if User.query.filter_by(email=form.email.data).first():
-            flash('Email already exists. Please log in.')
+        if form.password.data != form.confirm_password.data:
+            error_message = "Passwords do not match."
+        elif User.query.filter_by(email=form.email.data).first():
+            error_message = "Email already exists."
+        elif User.query.filter_by(username=form.username.data).first():
+            error_message = "Username already exists."
+        else:
+            # Create and save user
+            new_user = User(
+                username=form.username.data,
+                name=form.name.data,
+                surname=form.surname.data,
+                email=form.email.data,
+                phone_number=form.phone_number.data,
+                emergency_contact_name=form.emergency_contact_name.data,
+                emergency_contact_number=form.emergency_contact_number.data,
+                height=form.height.data,
+                weight=form.weight.data,
+                blood_type=form.blood_type.data,
+            )
+            new_user.set_password(form.password.data)
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Account created successfully! Please log in.')
             return redirect(url_for('auth_bp.login'))
-
-        # Check for duplicate username
-        if User.query.filter_by(username=form.username.data).first():
-            flash('Username already exists. Please choose another one.')
-            return redirect(url_for('auth_bp.signup'))
-
-        # Create new user
-        new_user = User(
-            username=form.username.data,
-            name=form.name.data,
-            surname=form.surname.data,
-            email=form.email.data,
-            phone_number=form.phone_number.data,
-            emergency_contact_name=form.emergency_contact_name.data,
-            emergency_contact_number=form.emergency_contact_number.data,
-            height=form.height.data,
-            weight=form.weight.data,
-            blood_type=form.blood_type.data
-        )
-        # Set password
-        new_user.set_password(form.password.data)
-
-        db.session.add(new_user)
-        db.session.commit()
-        flash('Account created successfully! Please log in.')
-        return redirect(url_for('auth_bp.login'))
-
-    return render_template('signup.html', form=form)
-
+    return render_template('signup.html', form=form, error_message=error_message)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
+    error_message = None  # Initialize error_message to avoid UnboundLocalError
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user and user.check_password(form.password.data):
             login_user(user)
-            flash('Logged in successfully.')
-            return redirect(url_for('home'))  # Redirect to home page
+            error_message = 'Logged in successfully.'
+            return redirect(url_for('home'))
         else:
-            flash('Invalid username or password.')
-    return render_template('login.html', form=form)
-
+            error_message = "Invalid username or password."
+    return render_template('login.html', form=form, error_message=error_message)
 
 @auth_bp.route('/logout')
 @login_required

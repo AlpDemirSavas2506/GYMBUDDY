@@ -115,6 +115,16 @@
         input::placeholder {
             color: #aaa;
         }
+        .error-message {
+    color: #d9534f; /* Bootstrap danger color */
+    background-color: #f8d7da; /* Light red background */
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 15px;
+    border: 1px solid #f5c2c7;
+}
     </style>
 </head>
 <body>
@@ -130,6 +140,11 @@
                 {{ form.password.label }}<br>
                 {{ form.password(class="form-control", placeholder="Enter your password") }}
             </div>
+                {% if error_message %}
+                <div class="error-message">
+                    {{ error_message }}
+                </div>
+                {% endif %}
             <div>
                 {{ form.submit(class="login-button") }}
             </div>

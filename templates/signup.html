@@ -146,22 +146,49 @@
     </style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const numericFields = document.querySelectorAll('input[name="height"], input[name="weight"]');
+
+    numericFields.forEach(field => {
+        field.addEventListener('input', function(e) {
+            // Allow only numbers and one decimal point
+            this.value = this.value.replace(/[^0-9.]/g, '');
+            if ((this.value.match(/\./g) || []).length > 1) {
+                this.value = this.value.slice(0, -1); // Remove additional dots
+            }
+        });
+    });
+
     document.querySelector('form').addEventListener('submit', function(e) {
         const email = document.querySelector('input[name="email"]').value;
         const phoneNumber = document.querySelector('input[name="phone_number"]').value;
+        const password = document.querySelector('input[name="password"]').value;
+        const confirmPassword = document.querySelector('input[name="confirm_password"]').value;
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const metuEmailRegex = /.+@metu\.edu\.tr$/; // Only allow METU emails
         const phoneRegex = /^\d+$/;
 
-        if (!emailRegex.test(email)) {
-            alert("Please enter a valid email address.");
-            e.preventDefault();
-            return;
+        let errorMessage = '';
+
+        // Email validation
+        if (!metuEmailRegex.test(email)) {
+            errorMessage = "Email must be a valid METU address (e.g., example@metu.edu.tr).";
         }
 
+        // Phone number validation
         if (!phoneRegex.test(phoneNumber)) {
-            alert("Phone number must contain only digits.");
-            e.preventDefault();
+            errorMessage = "Phone number must contain only digits.";
+        }
+
+        // Password validation
+        if (password !== confirmPassword) {
+            errorMessage = "Passwords do not match.";
+        }
+
+        if (errorMessage) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = errorMessage;
+            errorDiv.style.display = 'block';
+            e.preventDefault(); // Prevent form submission
         }
     });
 });
@@ -201,11 +228,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="form-group">
                     {{ form.height.label }}
-                    {{ form.height(class="form-control", placeholder="Enter your height in cm") }}
+                    {{ form.height(class="form-control", placeholder="Enter your height in cm", type="number", step="0.1") }}
                 </div>
                 <div class="form-group">
                     {{ form.weight.label }}
-                    {{ form.weight(class="form-control", placeholder="Enter your weight in kg") }}
+                    {{ form.weight(class="form-control", placeholder="Enter your weight in kg", type="number", step="0.1") }}
                 </div>
                 <div class="form-group">
                     {{ form.blood_type.label }}
@@ -228,6 +255,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="full-width">
                 {{ form.submit(class="signup-button") }}
             </div>
+            <div id="error-message" style="display: none; color: #d9534f; background-color: #f8d7da; padding: 10px; margin-bottom: 20px; border: 1px solid #f5c2c7; border-radius: 8px; font-weight: bold; text-align: center;">
+</div>
             <a href="{{ url_for('auth_bp.login') }}" class="back-button">Go back to Login</a>
         </form>
     </div>

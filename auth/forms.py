@@ -1,7 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, FloatField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional, Regexp
-from flask_wtf.file import FileField, FileAllowed
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional, Regexp, NumberRange
 
 
 class SignupForm(FlaskForm):
@@ -26,8 +25,20 @@ class SignupForm(FlaskForm):
             EqualTo('password', message="Passwords must match.")
         ]
     )
-    height = FloatField('Height', validators=[Optional()])
-    weight = FloatField('Weight', validators=[Optional()])
+    height = FloatField(
+        'Height',
+        validators=[
+            Optional(),
+            NumberRange(min=50.0, max=250.0, message="Height must be between 50.00 and 250.00 cm.")
+        ]
+    )
+    weight = FloatField(
+        'Weight',
+        validators=[
+            Optional(),
+            NumberRange(min=20.0, max=300.0, message="Weight must be between 20.00 and 300.00 kg.")
+        ]
+    )
     blood_type = StringField('Blood Type', validators=[Optional()])
     phone_number = StringField(
         'Phone Number',
@@ -50,7 +61,11 @@ class UpdateProfileForm(FlaskForm):
     surname = StringField('Surname', validators=[DataRequired()])
     email = StringField(
         'Email',
-        validators=[DataRequired(), Email(message="Please enter a valid email address.")]
+        validators=[
+            DataRequired(),
+            Email(message="Please enter a valid email address."),
+            Regexp(r".+@metu\.edu\.tr$", message="Email must be a valid METU address (e.g., example@metu.edu.tr).")
+        ]
     )
     phone_number = StringField(
         'Phone Number',
@@ -61,7 +76,19 @@ class UpdateProfileForm(FlaskForm):
     )
     emergency_contact_name = StringField('Emergency Contact Name', validators=[DataRequired()])
     emergency_contact_number = StringField('Emergency Contact Number', validators=[DataRequired()])
-    height = FloatField('Height', validators=[Optional()])
-    weight = FloatField('Weight', validators=[Optional()])
+    height = FloatField(
+        'Height',
+        validators=[
+            Optional(),
+            NumberRange(min=50.0, max=250.0, message="Height must be between 50.00 and 250.00 cm.")
+        ]
+    )
+    weight = FloatField(
+        'Weight',
+        validators=[
+            Optional(),
+            NumberRange(min=20.0, max=300.0, message="Weight must be between 20.00 and 300.00 kg.")
+        ]
+    )
     blood_type = StringField('Blood Type', validators=[Optional()])
     submit = SubmitField('Update Profile')

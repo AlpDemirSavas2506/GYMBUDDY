@@ -8,7 +8,6 @@ from config import mail
 from datetime import datetime
 
 
-
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'JUf6cQGC'
@@ -46,6 +45,7 @@ def create_app():
             upcoming_reservations=upcoming_reservations,
             past_reservations=past_reservations,
         )
+
     @app.route('/events')
     @login_required
     def events():
@@ -56,12 +56,12 @@ def create_app():
     def forum():
         return render_template('forum.html')
 
-
     @app.route('/profile')
     @login_required
     def profile():
         form = UpdateProfileForm(obj=current_user)
         return render_template('profile.html', user=current_user, form=form)
+
     @login_manager.user_loader
     def load_user(user_id):
         return db.session.get(User, int(user_id))
@@ -73,12 +73,12 @@ def create_app():
 
     @app.errorhandler(404)
     def page_not_found(e):
-        # Check if the user is authenticated
         if current_user.is_authenticated:
-            logout_user()
-            return redirect(url_for('auth_bp.login'))
+            # Redirect to a custom 404 page for logged-in users
+            return render_template('404.html'), 404
         else:
-            # For non-authenticated users, redirect to login with a message
+            # Redirect unauthenticated users to the login page
+            flash("Page not found. Please log in again.", "warning")
             return redirect(url_for('auth_bp.login'))
 
     # Define routes
@@ -87,9 +87,10 @@ def create_app():
         return redirect(url_for('auth_bp.login'))
 
     return app
+
+
 from flask import render_template, redirect, url_for
 from flask_login import logout_user, current_user
-
 
 if __name__ == '__main__':
     app = create_app()

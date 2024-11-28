@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, flash
 from flask_login import LoginManager
 from reservation.routes import reservation_bp
 from models import db, User
@@ -11,7 +11,7 @@ from datetime import datetime
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'JUf6cQGC'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:alp.demir@localhost/GymBuddy'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost/GymBuddy'
 
     # Email configuration
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'

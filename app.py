@@ -1,25 +1,31 @@
-from flask import Flask, flash
-from flask_login import LoginManager
+import os
+from flask import Flask, flash, render_template, redirect, url_for
+from flask_login import LoginManager, login_required, current_user
 from reservation.routes import reservation_bp
 from models import db, User
-from flask_login import login_required
 from auth.forms import UpdateProfileForm
 from config import mail
 from datetime import datetime
-
+from dotenv import load_dotenv
 
 def create_app():
+    # Load environment variables from .env file
+    load_dotenv()
+
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'JUf6cQGC'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost/GymBuddy'
+
+    # Use environment variables for configuration
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'fallback_secret_key')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 
     # Email configuration
-    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-    app.config['MAIL_PORT'] = 587
-    app.config['MAIL_USE_TLS'] = True
-    app.config['MAIL_USERNAME'] = 'trtstajtest@gmail.com'
-    app.config['MAIL_PASSWORD'] = 'kzbx faau iopp ofjw'
+    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+    app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True') == 'True'
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 
+    # Initialize extensions
     mail.init_app(app)
     db.init_app(app)
 
@@ -27,19 +33,17 @@ def create_app():
     login_manager.login_view = 'auth_bp.login'
     login_manager.init_app(app)
 
+    # Define routes and views...
     @app.route('/home')
     @login_required
     def home():
         today = datetime.now()
-
-        # Rezervasyonları tarihine göre ayır
         upcoming_reservations = [
             reservation for reservation in current_user.reservations if reservation.start_time >= today
         ]
         past_reservations = [
             reservation for reservation in current_user.reservations if reservation.start_time < today
         ]
-
         return render_template(
             'home.html',
             upcoming_reservations=upcoming_reservations,
@@ -74,23 +78,16 @@ def create_app():
     @app.errorhandler(404)
     def page_not_found(e):
         if current_user.is_authenticated:
-            # Redirect to a custom 404 page for logged-in users
             return render_template('404.html'), 404
         else:
-            # Redirect unauthenticated users to the login page
             flash("Page not found. Please log in again.", "warning")
             return redirect(url_for('auth_bp.login'))
 
-    # Define routes
     @app.route('/')
     def index():
         return redirect(url_for('auth_bp.login'))
 
     return app
-
-
-from flask import render_template, redirect, url_for
-from flask_login import logout_user, current_user
 
 if __name__ == '__main__':
     app = create_app()

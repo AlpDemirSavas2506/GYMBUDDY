@@ -5,8 +5,8 @@ from reservation.routes import reservation_bp
 from models import db, User
 from auth.forms import UpdateProfileForm
 from config import mail
-from datetime import datetime
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 
 def create_app():
     # Load environment variables from .env file
@@ -49,7 +49,9 @@ def create_app():
             upcoming_reservations=upcoming_reservations,
             past_reservations=past_reservations,
         )
-
+    @app.context_processor
+    def inject_datetime():
+        return {'datetime': datetime, 'timedelta': timedelta}
     @app.route('/events')
     @login_required
     def events():

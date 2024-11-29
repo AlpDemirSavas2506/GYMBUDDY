@@ -1,6 +1,56 @@
 {% extends "base.html" %}
 {% block title %}Forum - GymBuddy{% endblock %}
 {% block content %}
-<h1>Community Forum</h1>
-<p>Join discussions with other GymBuddy users here.</p>
+<div class="container mt-4">
+    <div class="text-center mb-4">
+        <h1 class="display-4">Community Forum</h1>
+        <p class="text-muted">Discuss, share, and connect with other GymBuddy users!</p>
+    </div>
+
+    <!-- New Topic Form -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Start a New Discussion</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    <label for="title" class="form-label">{{ form.title.label }}</label>
+                    {{ form.title(class="form-control", id="title", placeholder="Enter the topic title") }}
+                </div>
+                <div class="mb-3">
+                    <label for="explanation" class="form-label">{{ form.explanation.label }}</label>
+                    {{ form.explanation(class="form-control", id="explanation", placeholder="Write your explanation") }}
+                </div>
+                <button type="submit" class="btn btn-success">Post Topic</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Topics List -->
+    <div>
+        <h2 class="mb-4">Recent Discussions</h2>
+        {% if topics %}
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            {% for topic in topics %}
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ topic.title }}</h5>
+                        <p class="card-text text-truncate" style="max-height: 4rem; overflow: hidden;">
+                            {{ topic.explanation }}
+                        </p>
+                        <p class="text-muted small mb-1">By {{ topic.user.username }} on {{ topic.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        <a href="{{ url_for('forum_bp.topic_detail', topic_id=topic.id) }}" class="btn btn-primary btn-sm">View Discussion</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted text-center">No topics available. Start the first discussion!</p>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

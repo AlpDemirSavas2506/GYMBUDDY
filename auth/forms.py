@@ -96,3 +96,12 @@ class UpdateProfileForm(FlaskForm):
     )
     blood_type = StringField('Blood Type', validators=[Optional()])
     submit = SubmitField('Update Profile')
+
+class CreateTopicForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired(), Length(max=255)])
+    explanation = StringField('Explanation', validators=[DataRequired()])
+    submit = SubmitField('Create Topic')
+
+class ReplyForm(FlaskForm):
+    content = StringField('Reply', validators=[DataRequired()])
+    submit = SubmitField('Post Reply')

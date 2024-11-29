@@ -46,6 +46,7 @@ def signup():
             return redirect(url_for('auth_bp.login'))
     return render_template('signup.html', form=form, error_message=error_message)
 
+
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -59,6 +60,7 @@ def login():
         else:
             error_message = "Invalid username or password."
     return render_template('login.html', form=form, error_message=error_message)
+
 
 @auth_bp.route('/logout')
 @login_required
@@ -117,7 +119,9 @@ def profile():
 
     return render_template('profile.html', user=current_user, form=form)
 
+
 from flask import jsonify
+
 
 @auth_bp.route('/send-verification-code', methods=['POST'])
 @login_required
@@ -165,6 +169,7 @@ def change_password():
     db.session.commit()
     return jsonify(success=True)
 
+
 @auth_bp.route('/reset-password', methods=['GET', 'POST'])
 def reset_password():
     if request.method == 'POST':
@@ -194,8 +199,11 @@ def reset_password():
         flash("Something went wrong. Please try again.", "danger")
 
     return render_template('reset_password.html')
+
+
 from flask_mail import Message
 from random import randint
+
 
 @auth_bp.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():

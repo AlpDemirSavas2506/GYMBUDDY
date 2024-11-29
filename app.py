@@ -5,8 +5,8 @@ from reservation.routes import reservation_bp
 from models import db, User
 from auth.forms import UpdateProfileForm
 from config import mail
-from datetime import datetime
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 
 def create_app():
     # Load environment variables from .env file
@@ -49,16 +49,13 @@ def create_app():
             upcoming_reservations=upcoming_reservations,
             past_reservations=past_reservations,
         )
-
+    @app.context_processor
+    def inject_datetime():
+        return {'datetime': datetime, 'timedelta': timedelta}
     @app.route('/events')
     @login_required
     def events():
         return render_template('events.html')
-
-    @app.route('/forum')
-    @login_required
-    def forum():
-        return render_template('forum.html')
 
     @app.route('/profile')
     @login_required
@@ -72,8 +69,11 @@ def create_app():
 
     # Register blueprints
     from auth.routes import auth_bp
+    from forum.forum_routes import forum_bp
+
     app.register_blueprint(auth_bp)
     app.register_blueprint(reservation_bp)
+    app.register_blueprint(forum_bp)
 
     @app.errorhandler(404)
     def page_not_found(e):

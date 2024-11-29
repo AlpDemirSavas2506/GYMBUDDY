@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -47,3 +49,24 @@ class Reservation(db.Model):
     # Relationships
     user = db.relationship('User', back_populates='reservations')
     facility = db.relationship('Facility', back_populates='reservations')
+
+class ForumTopic(db.Model):
+    __tablename__ = 'forum_topics'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    explanation = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    replies = db.relationship('ForumReply', back_populates='topic', cascade='all, delete-orphan')
+    user = db.relationship('User')
+
+class ForumReply(db.Model):
+    __tablename__ = 'forum_replies'
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    topic_id = db.Column(db.Integer, db.ForeignKey('forum_topics.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    topic = db.relationship('ForumTopic', back_populates='replies')
+    user = db.relationship('User')

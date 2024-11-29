@@ -19,8 +19,9 @@
 
         <div class="form-group">
             <label for="date">Date:</label>
-            <input type="date" id="date" name="date" class="form-control" required>
-        </div>
+<input type="date" id="date" name="date" class="form-control" required
+       min="{{ datetime.utcnow().strftime('%Y-%m-%d') }}"
+       max="{{ (datetime.utcnow() + timedelta(days=7)).strftime('%Y-%m-%d') }}">        </div>
 
         <button type="button" id="fetch-slots" class="btn btn-primary btn-block">View Available Slots</button>
     </form>

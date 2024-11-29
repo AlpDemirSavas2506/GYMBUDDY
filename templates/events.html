@@ -1,6 +1,56 @@
 {% extends "base.html" %}
 {% block title %}Events - GymBuddy{% endblock %}
 {% block content %}
-<h1>Upcoming Events</h1>
-<p>Here are the latest events at GymBuddy.</p>
+<div class="container mt-4">
+    <h1 class="display-4 text-center mb-4">Etkinlikler</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            {{ form.title.label }}: {{ form.title(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.description.label }}: {{ form.description(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.event_date.label }}: {{ form.event_date(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.image.label }}: {{ form.image(class="form-control") }}
+        </div>
+        <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+    </form>
+
+    <hr class="my-4">
+
+    <div class="accordion" id="eventsAccordion">
+        {% for event in events %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{ event.id }}">
+                <button
+                    class="accordion-button {{ loop.index != 1 and 'collapsed' or '' }}"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse{{ event.id }}"
+                    aria-expanded="{{ loop.index == 1 }}"
+                    aria-controls="collapse{{ event.id }}">
+                    {{ event.title }} - {{ event.event_date.strftime('%B %Y') }}
+                </button>
+            </h2>
+            <div id="collapse{{ event.id }}" class="accordion-collapse collapse {{ loop.index == 1 and 'show' or '' }}"
+                aria-labelledby="heading{{ event.id }}"
+                data-bs-parent="#eventsAccordion">
+                <div class="accordion-body">
+                    {% if event.image %}
+                    <div class="text-center mb-3">
+                        <img src="{{ url_for('events_bp.event_image', event_id=event.id) }}" class="img-fluid rounded" alt="{{ event.title }}">
+                    </div>
+                    {% endif %}
+                    <p>{{ event.description }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

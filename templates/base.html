@@ -5,10 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}GymBuddy{% endblock %}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <style>
+        /* Navbar Styles */
+        .navbar {
+            background: linear-gradient(90deg, #007bff, #00d4ff); /* Blue gradient */
+        }
+        .navbar-brand {
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.5rem;
+            letter-spacing: 0.05rem;
+        }
+        .navbar-brand:hover {
+            color: #ffdf5e; /* Yellow hover effect */
+        }
+        .nav-link {
+            color: #fff;
+            font-size: 1rem;
+            margin-right: 0.5rem;
+            transition: color 0.3s;
+        }
+        .nav-link:hover {
+            color: #ffdf5e;
+        }
+        .nav-link.active {
+            color: #ffdf5e;
+            font-weight: bold;
+        }
+
+        /* Background Styling */
+        body {
+            background: #f3f4f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Content Area */
+        .container {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        /* Custom Footer */
+        footer {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        footer a {
+            color: #ffdf5e;
+            text-decoration: none;
+        }
+        footer a:hover {
+            color: #fff;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('home') }}">GymBuddy</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -17,16 +77,16 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('events') }}">Events</a>
+                        <a class="nav-link {% if request.endpoint == 'events_bp.events' %}active{% endif %}" href="{{ url_for('events_bp.events') }}">Events</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link"  href="{{ url_for('reservation_bp.reservation') }}">Reservation</a>
+                        <a class="nav-link {% if request.endpoint == 'reservation_bp.reservation' %}active{% endif %}" href="{{ url_for('reservation_bp.reservation') }}">Reservation</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('forum_bp.forum') }}">Forum</a>
+                        <a class="nav-link {% if request.endpoint == 'forum_bp.forum' %}active{% endif %}" href="{{ url_for('forum_bp.forum') }}">Forum</a>
                     </li>
                     <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
+                        <a class="nav-link {% if request.endpoint == 'profile' %}active{% endif %}" href="{{ url_for('profile') }}">Profile</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
@@ -43,6 +103,11 @@
         {% block content %}
         {% endblock %}
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2024 GymBuddy | <a href="#">Privacy Policy</a></p>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -52,11 +52,6 @@ def create_app():
     @app.context_processor
     def inject_datetime():
         return {'datetime': datetime, 'timedelta': timedelta}
-    @app.route('/events')
-    @login_required
-    def events():
-        return render_template('events.html')
-
     @app.route('/profile')
     @login_required
     def profile():
@@ -70,10 +65,12 @@ def create_app():
     # Register blueprints
     from auth.routes import auth_bp
     from forum.forum_routes import forum_bp
+    from events.event_routes import events_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(reservation_bp)
     app.register_blueprint(forum_bp)
+    app.register_blueprint(events_bp)
 
     @app.errorhandler(404)
     def page_not_found(e):

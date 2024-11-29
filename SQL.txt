@@ -64,3 +64,23 @@ CREATE TABLE public.users (
 	CONSTRAINT users_pkey PRIMARY KEY (id),
 	CONSTRAINT users_username_key UNIQUE (username)
 );
+
+
+
+-- Create the forum_topics table
+CREATE TABLE forum_topics (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    explanation TEXT NOT NULL,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create the forum_replies table
+CREATE TABLE forum_replies (
+    id SERIAL PRIMARY KEY,
+    content TEXT NOT NULL,
+    topic_id INTEGER NOT NULL REFERENCES forum_topics(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

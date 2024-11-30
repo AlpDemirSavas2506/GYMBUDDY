@@ -84,3 +84,12 @@ CREATE TABLE forum_replies (
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Create the events table
+CREATE TABLE events (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    event_date DATE NOT NULL,
+    image BYTEA  -- Binary field for storing images
+);

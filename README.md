@@ -10,10 +10,10 @@ Team ADOR
 
 4. Once logged in with your computer or mobile device, you can use the menu navigation to edit your profile, view available slots and reserve sessions
 
-Source Code
+# Source Code
 The source code is publicly available for review at: [GitHub - AlpDemirSavas2506/GYMBUDDY: TeamAdore ](https://github.com/AlpDemirSavas2506/GYMBUDDY)
 
-Database
+# Database
 The database is available at http://34.32.33.110/pgadmin4 (Permalink: https://gbdb.batukurt.com ) with the following credentials:
 
 Email/username:

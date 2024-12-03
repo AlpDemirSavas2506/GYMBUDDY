@@ -14,15 +14,7 @@ Team ADOR
 The source code is publicly available for review at: [GitHub - AlpDemirSavas2506/GYMBUDDY: TeamAdore ](https://github.com/AlpDemirSavas2506/GYMBUDDY)
 
 # Database
-The database is available at http://34.32.33.110/pgadmin4 (Permalink: https://gbdb.batukurt.com ) with the following credentials:
-
-Email/username:
-
-anilerenn@gmail.com
-
-Password:
-
-metu123
+The database is available at http://34.32.33.110/pgadmin4 (Permalink: https://gbdb.batukurt.com ) with the credentials given on our Review Guide on Confluence.
 
 # User Manual For GymBuddy
 

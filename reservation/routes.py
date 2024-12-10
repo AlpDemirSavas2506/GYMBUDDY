@@ -124,7 +124,7 @@ def reservation():
                 # Create a notification for the user
                 create_notification(
                 user_id=current_user.id,
-                message=f"Your reservation for start date: {start_time} end date: {end_time} has been cancelled."
+                message=f"Your reservation for start date: {reservation.start_time} end date: {reservation.end_time} has been cancelled."
                 )
                 
                 send_cancellation_email(
@@ -166,7 +166,7 @@ def reservation():
                 # Create a notification for the user
                 create_notification(
                     user_id=current_user.id,
-                    message=f"Your reservation for start date: {start_time} end date: {end_time} has been confirmed."
+                    message=f"Your reservation for start date: {new_reservation.start_time} end date: {new_reservation.end_time} has been confirmed."
                 )
 
                 send_reservation_email(

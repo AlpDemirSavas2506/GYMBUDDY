@@ -1,0 +1,22 @@
+/* Notification Icon Styling */
+#notificationIcon {
+    width: 24px;
+    height: 24px;
+    position: relative;
+}
+
+/* Notification Badge Styling */
+#notificationBadge {
+    position: absolute;
+    top: -5px; /* Adjust to position the badge at the top-right */
+    right: -5px; /* Adjust to position the badge at the top-right */
+    width: 16px;
+    height: 16px;
+    font-size: 12px;
+    line-height: 16px;
+    text-align: center;
+    border-radius: 50%;
+    background-color: red;
+    color: white;
+    display: none; /* Hidden by default */
+}

@@ -79,3 +79,22 @@ class Event(db.Model):
     description = db.Column(db.Text, nullable=False)
     event_date = db.Column(db.Date, nullable=False)
     image = db.Column(db.LargeBinary)  # Binary field for storing image data
+
+class Notification(db.Model):
+    __tablename__ = 'notifications'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+    user = db.relationship('User', backref='notifications')
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "message": self.message,
+            "is_read": self.is_read,
+            "created_at": self.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        }

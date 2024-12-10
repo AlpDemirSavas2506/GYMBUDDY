@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from models import User, Reservation, Facility, db
 from flask_login import login_required, current_user
 from datetime import datetime, timedelta
-from utility import send_reservation_email, send_cancellation_email
+from utility import send_reservation_email, send_cancellation_email, create_notification
 
 reservation_bp = Blueprint('reservation_bp', __name__)
 
@@ -120,6 +120,12 @@ def reservation():
             try:
                 db.session.delete(reservation)
                 db.session.commit()
+
+                # Create a notification for the user
+                create_notification(
+                user_id=current_user.id,
+                message=f"Your reservation for start date: {start_time} end date: {end_time} has been cancelled."
+                )
                 
                 send_cancellation_email(
                     user=current_user,
@@ -156,6 +162,12 @@ def reservation():
                 )
                 db.session.add(new_reservation)
                 db.session.commit()
+                
+                # Create a notification for the user
+                create_notification(
+                    user_id=current_user.id,
+                    message=f"Your reservation for start date: {start_time} end date: {end_time} has been confirmed."
+                )
 
                 send_reservation_email(
                     user=current_user,

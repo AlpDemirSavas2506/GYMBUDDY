@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from models import User, Reservation, Facility, db
 from flask_login import login_required, current_user
 from datetime import datetime, timedelta
-from utility import send_email
+from utility import send_reservation_email, send_cancellation_email
 
 reservation_bp = Blueprint('reservation_bp', __name__)
 
@@ -120,11 +120,11 @@ def reservation():
             try:
                 db.session.delete(reservation)
                 db.session.commit()
-
-                send_email(
-                    subject="Reservation Cancellation Confirmation",
-                    recipient=current_user.email,
-                    body=f"Your reservation has been canceled successfully."
+                
+                send_cancellation_email(
+                    user=current_user,
+                    f_start_time=reservation.start_time,
+                    f_end_time=reservation.end_time
                 )
 
                 return jsonify(success=True)
@@ -157,10 +157,10 @@ def reservation():
                 db.session.add(new_reservation)
                 db.session.commit()
 
-                send_email(
-                    subject="Reservation Confirmation",
-                    recipient=current_user.email,
-                    body=f"Your reservation has been confirmed successfully."
+                send_reservation_email(
+                    user=current_user,
+                    f_start_time=new_reservation.start_time,
+                    f_end_time=new_reservation.end_time
                 )
 
                 return jsonify(success=True)

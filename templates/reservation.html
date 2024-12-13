@@ -241,6 +241,7 @@
                                 });
                                 if (reserveResponse.ok) {
                                     alert('Reservation successful!');
+                                    updateNotificationCount();
                                     document.getElementById('fetch-slots').click(); // Refresh slots
                                 } else {
                                     const error = await reserveResponse.json();

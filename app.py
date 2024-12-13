@@ -1,12 +1,13 @@
 import os
-from flask import Flask, flash, render_template, redirect, url_for
 from flask_login import LoginManager, login_required, current_user
 from reservation.routes import reservation_bp
-from models import db, User, Notification
+from models import db, User, Notification, Reservation
 from auth.forms import UpdateProfileForm
 from config import mail
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
+from flask import Flask, jsonify, render_template, redirect, url_for, flash, request
+
 
 def create_app():
     # Load environment variables from .env file
@@ -71,7 +72,6 @@ def create_app():
         db.session.commit()  # Commit the changes to the database
 
         return jsonify({"success": True, "unread_count": 0})  # Respond with updated count
-
     @login_manager.user_loader
     def load_user(user_id):
         return db.session.get(User, int(user_id))

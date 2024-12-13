@@ -2,7 +2,7 @@ import os
 from flask import Flask, flash, render_template, redirect, url_for
 from flask_login import LoginManager, login_required, current_user
 from reservation.routes import reservation_bp
-from models import db, User
+from models import db, User, Notification
 from auth.forms import UpdateProfileForm
 from config import mail
 from dotenv import load_dotenv
@@ -57,6 +57,20 @@ def create_app():
     def profile():
         form = UpdateProfileForm(obj=current_user)
         return render_template('profile.html', user=current_user, form=form)
+
+    @app.route('/notifications/mark-read', methods=['POST'])
+    @login_required
+    def mark_notifications_as_read():
+        # Query for unread notifications for the current user
+        unread_notifications = Notification.query.filter_by(user_id=current_user.id, is_read=False).all()
+
+        # Mark all unread notifications as read
+        for notification in unread_notifications:
+            notification.is_read = True
+
+        db.session.commit()  # Commit the changes to the database
+
+        return jsonify({"success": True, "unread_count": 0})  # Respond with updated count
 
     @login_manager.user_loader
     def load_user(user_id):

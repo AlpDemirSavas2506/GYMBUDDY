@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file
-from models import Event, db
+from models import Event, db, User
 import io
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, DateField, FileField, SubmitField
@@ -15,6 +15,8 @@ class EventForm(FlaskForm):
     image = FileField('Image (Optional)')
     submit = SubmitField('Create Event')
 
+from utility import create_notification  # Import the notification function
+
 @events_bp.route('/events', methods=['GET', 'POST'])
 def events():
     form = EventForm()
@@ -28,6 +30,15 @@ def events():
         )
         db.session.add(new_event)
         db.session.commit()
+
+        # Send notification to all users
+        users = User.query.all()
+        for user in users:
+            create_notification(
+                user_id=user.id,
+                message=f"New event created: {new_event.title} on {new_event.event_date.strftime('%Y-%m-%d')}"
+            )
+
         flash('Event created successfully!', 'success')
         return redirect(url_for('events_bp.events'))
 

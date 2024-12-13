@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from models import ForumTopic, ForumReply, db
+from models import ForumTopic, ForumReply, db, User
 from auth.forms import CreateTopicForm, ReplyForm
+from utility import create_notification
 
 forum_bp = Blueprint('forum_bp', __name__)
 
@@ -9,9 +10,8 @@ forum_bp = Blueprint('forum_bp', __name__)
 @forum_bp.route('/forum', methods=['GET', 'POST'])
 @login_required
 def forum():
-    form = CreateTopicForm()  # Create the form instance
+    form = CreateTopicForm()
     if form.validate_on_submit():
-        # Handle form submission
         new_topic = ForumTopic(
             title=form.title.data,
             explanation=form.explanation.data,
@@ -19,10 +19,22 @@ def forum():
         )
         db.session.add(new_topic)
         db.session.commit()
+
+        # Debug: Check if topic creation works
+        print(f"New Topic Created: {new_topic.title}")
+
+        # Notify all users except the creator
+        users = User.query.all()  # Removed filter
+        for user in users:
+            create_notification(
+                user_id=user.id,
+                message=f"New discussion started: {new_topic.title} by {current_user.username}"
+            )
+            print(f"Notification sent to: {user.username}")  # Debug print
+
         flash('Topic created successfully!', 'success')
         return redirect(url_for('forum_bp.forum'))
 
-    # Pass the form to the template
     topics = ForumTopic.query.order_by(ForumTopic.created_at.desc()).all()
     return render_template('forum.html', form=form, topics=topics)
 

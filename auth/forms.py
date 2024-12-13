@@ -105,3 +105,20 @@ class CreateTopicForm(FlaskForm):
 class ReplyForm(FlaskForm):
     content = StringField('Reply', validators=[DataRequired()])
     submit = SubmitField('Post Reply')
+
+from flask_wtf import FlaskForm
+from wtforms import SelectMultipleField, SubmitField
+from wtforms.validators import DataRequired
+
+class NotificationPreferencesForm(FlaskForm):
+    preferences = SelectMultipleField(
+        'Select Notifications You Want to Receive:',
+        choices=[
+            ('reservation', 'Reservation Notifications'),
+            ('forum', 'Forum Notifications'),
+            ('events', 'Event Notifications')
+        ],
+        validators=[DataRequired()]
+    )
+    submit = SubmitField('Save Preferences')
+

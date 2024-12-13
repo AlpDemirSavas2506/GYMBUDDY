@@ -21,18 +21,16 @@ from utility import create_notification  # Import the notification function
 def events():
     form = EventForm()
     if form.validate_on_submit():
-        image_data = form.image.data.read() if form.image.data else None
         new_event = Event(
             title=form.title.data,
             description=form.description.data,
             event_date=form.event_date.data,
-            image=image_data
         )
         db.session.add(new_event)
         db.session.commit()
 
-        # Send notification to all users
-        users = User.query.all()
+        # Notify users who want event notifications
+        users = User.query.filter(User.notification_preferences.contains(['events'])).all()
         for user in users:
             create_notification(
                 user_id=user.id,

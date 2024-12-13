@@ -241,8 +241,12 @@
                                 });
                                 if (reserveResponse.ok) {
                                     alert('Reservation successful!');
-                                    updateNotificationCount();
-                                    document.getElementById('fetch-slots').click(); // Refresh slots
+                                   await new Promise(resolve => {
+                                        document.getElementById('fetch-slots').click();  // Refresh slots
+                                        setTimeout(resolve, 500);  // Wait 500ms to ensure fetch-slots finishes
+                                    });
+
+                                   await updateNotificationCount();  // Update notifications dynamically
                                 } else {
                                     const error = await reserveResponse.json();
                                     alert(`Failed to reserve slot: ${error.error || 'Unknown error'}`);
@@ -262,6 +266,27 @@
             alert("An error occurred while fetching slots. Please try again.");
         }
     });
+    async function updateNotificationCount() {
+    try {
+        const response = await fetch('/notifications');
+        if (!response.ok) throw new Error("Failed to fetch notifications.");
+
+        const data = await response.json();
+        const unreadCount = data.filter(n => !n.is_read).length;
+
+        const badge = document.getElementById('notificationBadge');
+
+        if (unreadCount > 0) {
+            badge.textContent = unreadCount;
+            badge.style.display = 'inline-flex';
+        } else {
+            badge.textContent = '';
+            badge.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error updating notification count:', error);
+    }
+}
 </script>
 
 

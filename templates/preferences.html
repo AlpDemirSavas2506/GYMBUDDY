@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Notification Preferences - GymBuddy{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="display-5">Notification Preferences</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            {{ form.preferences.label }}
+            {{ form.preferences(class="form-control") }}
+        </div>
+        <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+    </form>
+</div>
+{% endblock %}

@@ -49,6 +49,9 @@
                 <label for="blood"><i class="fas fa-tint"></i> Blood Type</label>
                 {{ form.blood_type(class="form-control", id="blood") }}
             </div>
+               <div class="mt-4 text-center">
+                    <a href="{{ url_for('auth_bp.notification_preferences') }}" class="btn btn-info">Manage Notification Preferences</a>
+                </div>
             <button type="submit" class="btn btn-primary btn-block">Update Profile</button>
         </form>
     </div>

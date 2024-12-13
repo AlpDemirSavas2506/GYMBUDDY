@@ -20,23 +20,20 @@ def forum():
         db.session.add(new_topic)
         db.session.commit()
 
-        # Debug: Check if topic creation works
-        print(f"New Topic Created: {new_topic.title}")
-
-        # Notify all users except the creator
-        users = User.query.all()  # Removed filter
+        # Notify users who want forum notifications
+        users = User.query.filter(User.notification_preferences.contains(['forum'])).all()
         for user in users:
             create_notification(
                 user_id=user.id,
                 message=f"New discussion started: {new_topic.title} by {current_user.username}"
             )
-            print(f"Notification sent to: {user.username}")  # Debug print
 
         flash('Topic created successfully!', 'success')
         return redirect(url_for('forum_bp.forum'))
 
     topics = ForumTopic.query.order_by(ForumTopic.created_at.desc()).all()
     return render_template('forum.html', form=form, topics=topics)
+
 
 @forum_bp.route('/forum/<int:topic_id>', methods=['GET', 'POST'])
 @login_required

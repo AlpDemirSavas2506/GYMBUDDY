@@ -4,6 +4,7 @@ from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.dialects.postgresql import BYTEA
+from sqlalchemy.dialects.postgresql import ARRAY, TEXT
 
 db = SQLAlchemy()
 class User(db.Model, UserMixin):
@@ -21,6 +22,7 @@ class User(db.Model, UserMixin):
     emergency_contact_name = db.Column(db.String(150))
     emergency_contact_number = db.Column(db.String(20))
     reservations = db.relationship('Reservation', back_populates='user', cascade='all, delete-orphan')
+    notification_preferences = db.Column(ARRAY(TEXT), default=[])
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

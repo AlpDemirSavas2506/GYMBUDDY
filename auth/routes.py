@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash
 from app import mail
-from .forms import SignupForm, LoginForm, UpdateProfileForm
+from .forms import SignupForm, LoginForm, UpdateProfileForm, NotificationPreferencesForm
 from models import User, Reservation, Facility
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
@@ -232,4 +232,20 @@ def forgot_password():
         flash("Email not found. Please check and try again.", "danger")
 
     return render_template('forgot_password.html')
+
+@auth_bp.route('/profile/preferences', methods=['GET', 'POST'])
+@login_required
+def notification_preferences():
+    form = NotificationPreferencesForm()
+
+    # Save preferences on POST
+    if form.validate_on_submit():
+        current_user.notification_preferences = form.preferences.data
+        db.session.commit()
+        flash('Notification preferences updated!', 'success')
+        return redirect(url_for('auth_bp.notification_preferences'))
+
+    # Preload selected preferences on GET
+    form.preferences.data = current_user.notification_preferences
+    return render_template('preferences.html', form=form)
 

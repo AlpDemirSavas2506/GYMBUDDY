@@ -39,8 +39,6 @@ Click Sign Up.
 
 If successful, you'll see a confirmation message and be redirected to the login page.
 
- 
-
 2. Logging In
 How to Log In
 Navigate to the Login Page.
@@ -75,7 +73,7 @@ Past reservations are listed below.
 
 Navigation Links:
 
-Access pages like Reservation, Forum, Events, and Profile from the top menu.
+Access pages like Events, Reservation, Forum, and Profile from the top menu.
 
 5. Reservation System
 How to Make a Reservation
@@ -91,14 +89,14 @@ Click on an available slot (green) to book it.
 
 Confirm your selection when prompted.
 
+You will get an e-mail confirmation.
+
 How to Cancel a Reservation
 View your reservations on the Home or Reservation page.
 
 Click the Cancel button next to your booking.
 
 Confirm the cancellation. You’ll receive an email confirmation.
-
- 
 
 6. Profile Management
 How to Update Profile
@@ -124,11 +122,42 @@ Enter a new password and confirm it.
 
 Click Change Password to save.
 
-7. Additional Features
-Events and Forum
-Accessible from the top navigation menu.
+7. Events
+How to Create an Event
+Navigate to the Events page
 
-These pages are placeholders for future development.
+Write the event title.
+
+Add a description for your event.
+
+Select the event date from the calendar.
+
+You can upload the event poster if you prefer.
+
+Click Create Event to save the event.
+
+You will see the event details at the bottom of the page.
+
+8. Forum
+How to Start a New Discussion
+
+Go to the Forum page.
+
+Add a title for your discussion.
+
+Explain your issue.
+
+Click Post Topic to publish.
+
+How to Join another Discussion
+
+Click the View Discussion button under the Recent Discussions section.
+
+Write your reply.
+
+Click the Reply button to share your comments.
+
+You can see the previous replies at the bottom of the page.
 
 FAQ
 What happens if a reservation overlaps?

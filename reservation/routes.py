@@ -114,6 +114,7 @@ def reservation():
 
         if operation == 'cancel':
             reservation = Reservation.query.filter_by(id=reservation_id, user_id=current_user.id).first()
+            facility = Facility.query.get(reservation.facility_id)
             if not reservation:
                 return jsonify({'error': 'You can only cancel your own reservations.'}), 403
 
@@ -124,11 +125,12 @@ def reservation():
                 # Create a notification for the user
                 create_notification(
                 user_id=current_user.id,
-                message=f"Your reservation for start date: {reservation.start_time} end date: {reservation.end_time} has been cancelled."
+                message=f"Your reservation for {facility.name} on start date: {reservation.start_time} end date: {reservation.end_time} has been cancelled."
                 )
                 
                 send_cancellation_email(
                     user=current_user,
+                    f_facility_name=facility.name,
                     f_start_time=reservation.start_time,
                     f_end_time=reservation.end_time
                 )
@@ -160,17 +162,20 @@ def reservation():
                     start_time=start_time,
                     end_time=end_time
                 )
+                facility = Facility.query.get(new_reservation.facility_id)
+
                 db.session.add(new_reservation)
                 db.session.commit()
                 
                 # Create a notification for the user
                 create_notification(
                     user_id=current_user.id,
-                    message=f"Your reservation for start date: {new_reservation.start_time} end date: {new_reservation.end_time} has been confirmed."
+                    message=f"Your reservation for {facility.name} on start date: {new_reservation.start_time} end date: {new_reservation.end_time} has been confirmed."
                 )
 
                 send_reservation_email(
                     user=current_user,
+                    f_facility_name=facility.name,
                     f_start_time=new_reservation.start_time,
                     f_end_time=new_reservation.end_time
                 )

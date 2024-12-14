@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from models import ForumTopic, ForumReply, db, User
 from auth.forms import CreateTopicForm, ReplyForm
-from utility import create_notification
+from utility import create_notification, send_topic_created_email
 
 forum_bp = Blueprint('forum_bp', __name__)
 
@@ -28,6 +28,13 @@ def forum():
                 message=f"New discussion started: {new_topic.title} by {current_user.username}"
             )
 
+            send_topic_created_email(
+            user=user,
+            f_topic_title=new_topic.title,
+            f_topic_creator_name=current_user.username,             
+            f_message=new_topic.explanation
+            )
+
         flash('Topic created successfully!', 'success')
         return redirect(url_for('forum_bp.forum'))
 
@@ -48,6 +55,7 @@ def topic_detail(topic_id):
         )
         db.session.add(new_reply)
         db.session.commit()
+
         flash('Reply posted successfully!', 'success')
         return redirect(url_for('forum_bp.topic_detail', topic_id=topic_id))
 

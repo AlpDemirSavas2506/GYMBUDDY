@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New Event: {{ event_title }}</title>
+</head>
+<body>
+    <h2>New Event Announcement</h2>
+    <p>Dear {{ user_name }},</p>
+    <p>A new event has been created on GymBuddy! Here is the information about this event:</p>
+    <p><strong>Event Title:</strong> {{ event_title }}</p>
+    <p><strong>Event Date:</strong> {{ event_date }}</p>
+    
+    {% if event_image %}
+        <img src="{{ event_image }}" alt="{{ event_title }}" style="width: 100%; max-width: 400px; height: auto;">
+    {% endif %}
+</body>
+</html>

@@ -15,16 +15,18 @@ class EventForm(FlaskForm):
     image = FileField('Image (Optional)')
     submit = SubmitField('Create Event')
 
-from utility import create_notification  # Import the notification function
+from utility import create_notification, send_event_created_email
 
 @events_bp.route('/events', methods=['GET', 'POST'])
 def events():
     form = EventForm()
     if form.validate_on_submit():
+        image_data = form.image.data.read() if form.image.data else None
         new_event = Event(
             title=form.title.data,
             description=form.description.data,
             event_date=form.event_date.data,
+            image=image_data
         )
         db.session.add(new_event)
         db.session.commit()
@@ -35,6 +37,13 @@ def events():
             create_notification(
                 user_id=user.id,
                 message=f"New event created: {new_event.title} on {new_event.event_date.strftime('%Y-%m-%d')}"
+            )
+
+            send_event_created_email(
+                user=user,
+                f_event_title=new_event.title,
+                f_event_date=new_event.event_date.strftime('%Y-%m-%d'),
+                f_event_image=new_event.image
             )
 
         flash('Event created successfully!', 'success')

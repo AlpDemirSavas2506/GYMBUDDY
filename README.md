@@ -159,7 +159,8 @@ Click the Reply button to share your comments.
 
 You can see the previous replies at the bottom of the page.
 
-FAQ
+
+# FAQ
 What happens if a reservation overlaps?
 
 You’ll be notified if the time slot is unavailable.

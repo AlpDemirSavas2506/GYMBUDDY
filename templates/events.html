@@ -13,7 +13,7 @@
             {{ form.description.label }}: {{ form.description(class="form-control") }}
         </div>
         <div class="mb-3">
-            {{ form.event_date.label }}: {{ form.event_date(class="form-control") }}
+            {{ form.event_date.label }}: {{ form.event_date(class="form-control", min=datetime.utcnow().strftime('%Y-%m-%d')   ) }}
         </div>
         <div class="mb-3">
             {{ form.image.label }}: {{ form.image(class="form-control") }}

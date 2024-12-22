@@ -30,14 +30,14 @@ class SignupForm(FlaskForm):
         ]
     )
     height = FloatField(
-        'Height',
+        'Height (cm)',
         validators=[
             Optional(),
             NumberRange(min=50.0, max=250.0, message="Height must be between 50.00 and 250.00 cm.")
         ]
     )
     weight = FloatField(
-        'Weight',
+        'Weight (kg)',
         validators=[
             Optional(),
             NumberRange(min=20.0, max=300.0, message="Weight must be between 20.00 and 300.00 kg.")

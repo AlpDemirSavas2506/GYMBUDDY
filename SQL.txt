@@ -103,7 +103,32 @@ CREATE TABLE notifications (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
-
-
 ALTER TABLE users ADD COLUMN notification_preferences TEXT[];
+
+-- Adding facilities
+INSERT INTO public.facilities (name)
+VALUES
+    ('1 Nolu Açık Tenis Kortu (Merkez Tenis Kortları)'),
+    ('1 Nolu Tenis Kortu (Büyük Spor Salonu)'),
+    ('2 Nolu Açık Tenis Kortu (Merkez Tenis Kortları)'),
+    ('2 Nolu Tenis Kortu (Büyük Spor Salonu)'),
+    ('3 Nolu Açık Tenis Kortu (Merkez Tenis Kortları)'),
+    ('3 Nolu Tenis Kortu (Büyük Spor Salonu)'),
+    ('4 Nolu Kapalı Tenis Kortu (Merkez Tenis Kortları)'),
+    ('5 Nolu Kapalı Tenis Kortu (Merkez Tenis Kortları)'),
+    ('Açık Toprak Kort (Merkez Tenis Kortları)'),
+    ('Baraka Spor Salonu - Ana Salon (Voleybol)'),
+    ('Baraka Spor Salonu - Ana Salon (Basketbol)'),
+    ('Halı Saha1'),
+    ('Halı Saha2'),
+    ('Halı Saha3'),
+    ('1 Nolu Kapalı Tenis Kortu (Merkez Tenis Kortları)'),
+    ('2 Nolu Kapalı Tenis Kortu (Merkez Tenis Kortları)'),
+    ('Baraka Spor Salonu - Fitness Salonu'),
+    ('Baraka Spor Salonu - Minder Sporları Salonu'),
+    ('Baraka Spor Salonu - Aynalı Salon'),
+    ('Baraka Spor Salonu Stadyum'),
+    ('ODTÜKENT Spor Merkezi- Squash Kortu 1'),
+    ('ODTÜKENT Spor Merkezi- Squash Kortu 2');
+
+

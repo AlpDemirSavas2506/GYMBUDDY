@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const confirmPassword = document.querySelector('input[name="confirm_password"]').value;
 
         const metuEmailRegex = /.+@metu\.edu\.tr$/; // Only allow METU emails
-        const phoneRegex = /^\d+$/;
+        const phoneRegex = /^0\d{10}$/;
 
         let errorMessage = '';
 
@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Phone number validation
         if (!phoneRegex.test(phoneNumber)) {
-            errorMessage = "Phone number must contain only digits.";
+            errorMessage = "Phone number must contain only digits and must have valid length.";
         }
 
         // Password validation
@@ -236,7 +236,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="form-group">
                     {{ form.blood_type.label }}
-                    {{ form.blood_type(class="form-control", placeholder="Enter your blood type") }}
+                    <select id="blood_type" name="blood_type" class="form-control" required>
+                        <option value="">Select Blood Type</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="0+">0+</option>
+                        <option value="0-">0-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                    </select>
                 </div>
 <div class="form-group">
     {{ form.phone_number.label }}

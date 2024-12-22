@@ -45,10 +45,20 @@
                     {{ form.weight.label }}
                     {{ form.weight(class="form-control", placeholder="Enter your weight in kg", type="number", step="0.1") }}
                 </div>
-            <div class="form-group">
-                <label for="blood"><i class="fas fa-tint"></i> Blood Type</label>
-                {{ form.blood_type(class="form-control", id="blood") }}
-            </div>
+                <div class="form-group">
+                    <label for="blood"><i class="fas fa-tint"></i> Blood Type</label>
+                    <select id="blood" name="blood_type" class="form-control" required>
+                        <option value="">Select Blood Type</option>
+                        <option value="A+" {{ 'selected' if form.blood_type.data == 'A+' else '' }}>A+</option>
+                        <option value="A-" {{ 'selected' if form.blood_type.data == 'A-' else '' }}>A-</option>
+                        <option value="B+" {{ 'selected' if form.blood_type.data == 'B+' else '' }}>B+</option>
+                        <option value="B-" {{ 'selected' if form.blood_type.data == 'B-' else '' }}>B-</option>
+                        <option value="0+" {{ 'selected' if form.blood_type.data == '0+' else '' }}>0+</option>
+                        <option value="0-" {{ 'selected' if form.blood_type.data == '0-' else '' }}>0-</option>
+                        <option value="AB+" {{ 'selected' if form.blood_type.data == 'AB+' else '' }}>AB+</option>
+                        <option value="AB-" {{ 'selected' if form.blood_type.data == 'AB-' else '' }}>AB-</option>
+                    </select>
+                </div>
                <div class="mt-4 text-center">
                     <a href="{{ url_for('auth_bp.notification_preferences') }}" class="btn btn-info">Manage Notification Preferences</a>
                 </div>
@@ -250,9 +260,9 @@
         }
 
         // Phone number validation
-        const phoneRegex = /^\d+$/;
+        const phoneRegex = /^0\d{10}$/;
         if (!phoneRegex.test(phoneNumber)) {
-            alert("Phone number must contain only digits.");
+            alert("Phone number must contain only digits and must have valid length.");
             e.preventDefault();
             return;
         }

@@ -3,6 +3,7 @@ from models import User, Reservation, Facility, db
 from flask_login import login_required, current_user
 from datetime import datetime, timedelta
 from utility import send_reservation_email, send_cancellation_email, create_notification
+from sqlalchemy.sql import func
 
 reservation_bp = Blueprint('reservation_bp', __name__)
 
@@ -155,6 +156,16 @@ def reservation():
 
                 if conflicting_reservation:
                     return jsonify({'error': 'The selected time slot is already booked.'}), 400
+                
+                # Check how many reservations exist for the same facility and day
+                existing_reservations_count = Reservation.query.filter(
+                    Reservation.user_id == current_user.id,
+                    Reservation.facility_id == facility_id,
+                    func.date(Reservation.start_time) == func.date(start_time)  # Compare only the date
+                ).count()
+
+                if existing_reservations_count >= 2:
+                    return jsonify({'error': 'You can only reserve up to 2 slots for this facility on the same day.'}), 400
 
                 new_reservation = Reservation(
                     user_id=current_user.id,

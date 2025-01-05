@@ -76,6 +76,8 @@ def reservation():
             # Build available slots
             slots = []
             current_time = opening_time
+            now = datetime.now()  # Get current server time
+
             while current_time < closing_time:
                 next_time = current_time + slot_duration
                 overlapping_reservation = next(
@@ -93,11 +95,12 @@ def reservation():
                         'username': overlapping_reservation['username']
                     })
                 else:
-                    slots.append({
-                        'start_time': current_time.isoformat(),
-                        'end_time': next_time.isoformat(),
-                        'available': True
-                    })
+                    if current_time >= now or current_time.date() > now.date():
+                        slots.append({
+                            'start_time': current_time.isoformat(),
+                            'end_time': next_time.isoformat(),
+                            'available': True
+                        })
 
                 current_time = next_time
 

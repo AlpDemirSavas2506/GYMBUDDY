@@ -20,14 +20,14 @@ def get_calendar_data():
         for res in reservations
     ]
 
-    # Fetch university events
+    # Fetch university events (use event_date for both start and end)
     events = Event.query.all()
     event_data = [
         {
             "id": f"event-{event.id}",
             "title": f"Event: {event.title}",
-            "start": event.start.isoformat(),
-            "end": event.end.isoformat(),
+            "start": event.event_date.isoformat(),  # Use event_date for start
+            "end": event.event_date.isoformat(),    # Use event_date for end
             "description": event.description,
             "type": "event"
         }

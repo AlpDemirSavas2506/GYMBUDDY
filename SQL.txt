@@ -131,4 +131,16 @@ VALUES
     ('ODTÜKENT Spor Merkezi- Squash Kortu 1'),
     ('ODTÜKENT Spor Merkezi- Squash Kortu 2');
 
+-- Adding user_events table for user defined calendar events
+CREATE TABLE user_events (
+    id SERIAL PRIMARY KEY, -- Auto-incrementing primary key
+    title VARCHAR(255) NOT NULL, -- Title of the event
+    start TIMESTAMP NOT NULL, -- Start date and time of the event
+    end TIMESTAMP NOT NULL, -- End date and time of the event
+    description TEXT, -- Optional description of the event
+    user_id INT NOT NULL, -- Foreign key to link the event to a user
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- Cascade delete when a user is removed
+);
+
+
 

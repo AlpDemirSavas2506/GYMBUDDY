@@ -1,5 +1,5 @@
-from flask import Blueprint, jsonify, render_template
-from models import Reservation, Event
+from flask import Blueprint, jsonify, render_template, request
+from models import Reservation, Event, UserEvent, db
 from datetime import datetime
 from flask_login import current_user, login_required
 
@@ -35,9 +35,19 @@ def get_calendar_data():
         }
         for event in events
     ]
+        # Fetch user-defined events
+    user_events = UserEvent.query.filter_by(user_id=current_user.id).all()
+    user_events_data = [{
+        'id': f"user-{event.id}",
+        'title': event.title,
+        'start': event.start.isoformat(),
+        'end': event.end.isoformat(),
+        'description': event.description,
+        'type': 'user_event'  # Add type for identification
+    } for event in user_events]
 
     # Combine reservations and events
-    combined_data = reservation_data + event_data
+    combined_data = reservation_data + event_data + user_events_data
 
     return jsonify(combined_data)
 
@@ -46,3 +56,27 @@ def get_calendar_data():
 def view_calendar():
     return render_template('calendar.html')
 
+@calendar_bp.route('/calendar/user-events', methods=['POST'])
+@login_required
+def create_user_event():
+    data = request.json
+    new_event = UserEvent(
+        title=data['title'],
+        start=data['start'],
+        end=data['end'],
+        description=data.get('description', ''),
+        user_id=current_user.id
+    )
+    db.session.add(new_event)
+    db.session.commit()
+    return jsonify({'message': 'Event created successfully', 'event_id': new_event.id})
+
+@calendar_bp.route('/calendar/user-events/<int:event_id>', methods=['DELETE'])
+@login_required
+def delete_user_event(event_id):
+    event = UserEvent.query.get_or_404(event_id)
+    if event.user_id != current_user.id:
+        return jsonify({'error': 'Unauthorized access'}), 403
+    db.session.delete(event)
+    db.session.commit()
+    return jsonify({'message': 'Event deleted successfully'})

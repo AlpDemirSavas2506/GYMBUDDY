@@ -15,28 +15,77 @@
 
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-            editable: false,
-            events: '/api/calendar', // Fetch reservations and events from the API
+            editable: true, // Allow interaction with calendar
+            selectable: true, // Enable date selection
+            events: '/api/calendar', // Fetch all events (user, reservation, university)
+            select: function (info) {
+                // Prompt user for event details
+                const title = prompt('Enter a title for your event:');
+                if (title) {
+                    const description = prompt('Enter a description (optional):');
+                    
+                    // Send event data to backend
+                    fetch('/calendar/user-events', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            title: title,
+                            start: info.startStr,
+                            end: info.endStr,
+                            description: description || '',
+                        }),
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            alert('Event created successfully!');
+                            calendar.refetchEvents(); // Refresh calendar
+                        } else {
+                            alert('Failed to create event.');
+                        }
+                    });
+                }
+            },
             eventClick: function (info) {
-                const eventTitle = info.event.title;
-                const eventStart = info.event.start.toLocaleString(); // Convert to readable format
-                const eventEnd = info.event.end ? info.event.end.toLocaleString() : 'No end time';
-                const eventType = info.event.extendedProps.type; // Type of event (reservation or event)
-
                 // Display event details
+                const eventTitle = info.event.title;
+                const eventStart = info.event.start.toLocaleString();
+                const eventEnd = info.event.end ? info.event.end.toLocaleString() : 'No end time';
+                const eventType = info.event.extendedProps.type;
+
                 let message = `${eventTitle}\nStart Date: ${eventStart}\nEnd Date: ${eventEnd}`;
-                if (eventType === "event") {
+                if (eventType === "event" || eventType === "user_event") {
                     const description = info.event.extendedProps.description || "No description available";
                     message += `\nDescription: ${description}`;
                 }
 
-                alert(message);
+                if (eventType === "user_event") {
+                    // Confirm deletion of user event
+                    const deleteConfirm = confirm(message + '\n\nDo you want to delete this event?');
+                    if (deleteConfirm) {
+                        fetch(`/calendar/user-events/${info.event.extendedProps.id}`, {
+                            method: 'DELETE',
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                alert('Event deleted successfully!');
+                                calendar.refetchEvents(); // Refresh calendar
+                            } else {
+                                alert('Failed to delete event.');
+                            }
+                        });
+                    }
+                } else {
+                    alert(message); // Display details for non-user events
+                }
             }
         });
 
         calendar.render();
     });
 </script>
+
 
 
 {% endblock %}

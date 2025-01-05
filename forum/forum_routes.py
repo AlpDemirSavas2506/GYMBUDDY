@@ -47,6 +47,10 @@ def forum():
 def topic_detail(topic_id):
     topic = ForumTopic.query.get_or_404(topic_id)
     form = ReplyForm()
+
+    # Ownership check for the topic
+    is_topic_owner = topic.user_id == current_user.id
+
     if form.validate_on_submit():
         new_reply = ForumReply(
             content=form.content.data,
@@ -59,8 +63,19 @@ def topic_detail(topic_id):
         flash('Reply posted successfully!', 'success')
         return redirect(url_for('forum_bp.topic_detail', topic_id=topic_id))
 
-    replies = ForumReply.query.filter_by(topic_id=topic_id).order_by(ForumReply.created_at).all()
-    return render_template('topic_detail.html', topic=topic, replies=replies, form=form)
+    # Fetch replies and include ownership information
+    replies = [
+        {
+            'id': reply.id,
+            'content': reply.content,
+            'user': reply.user,  # Assuming `reply.user` provides the user object
+            'created_at': reply.created_at,
+            'is_owner': reply.user_id == current_user.id
+        }
+        for reply in ForumReply.query.filter_by(topic_id=topic_id).order_by(ForumReply.created_at).all()
+    ]
+
+    return render_template('topic_detail.html', topic=topic, replies=replies, form=form, is_topic_owner=is_topic_owner)
 
 
 @forum_bp.route('/forum/<int:topic_id>/delete', methods=['POST'])

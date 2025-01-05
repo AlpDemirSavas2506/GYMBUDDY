@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Calendar - GymBuddy{% endblock %}
+{% block content %}
+
+<div class="container mt-4">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+
+    <div id="calendar"></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
+
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            editable: false,
+            events: '/api/calendar', // Fetch reservations and events from the API
+            eventClick: function (info) {
+                alert(`${info.event.title}\n${info.event.extendedProps.description}`);
+            }
+        });
+
+        calendar.render();
+    });
+</script>
+{% endblock %}

@@ -81,12 +81,14 @@ def create_app():
     from forum.forum_routes import forum_bp
     from events.event_routes import events_bp
     from notification.notification_routes import notification_bp
+    from local_calendar.calendar_routes import calendar_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(reservation_bp)
     app.register_blueprint(forum_bp)
     app.register_blueprint(events_bp)
     app.register_blueprint(notification_bp)
+    app.register_blueprint(calendar_bp)
 
     @app.errorhandler(404)
     def page_not_found(e):

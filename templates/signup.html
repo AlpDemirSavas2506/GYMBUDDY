@@ -157,6 +157,42 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+document.getElementById('password').addEventListener('input', function () {
+    const password = this.value;
+    const validationMessages = [];
+
+    // Password validation rules
+    if (password.length < 6) {
+        validationMessages.push("Password must be at least 6 characters long.");
+    }
+    if (!/[A-Z]/.test(password)) {
+        validationMessages.push("Password must contain at least one uppercase letter.");
+    }
+    if (!/[a-z]/.test(password)) {
+        validationMessages.push("Password must contain at least one lowercase letter.");
+    }
+    if (!/[0-9]/.test(password)) {
+        validationMessages.push("Password must contain at least one number.");
+    }
+    if (!/[^A-Za-z0-9]/.test(password)) {
+        validationMessages.push("Password must contain at least one special character.");
+    }
+
+    // Display validation messages
+    const validationContainer = document.getElementById('password-validation');
+    validationContainer.innerHTML = validationMessages.map(msg => `<li>${msg}</li>`).join('');
+
+    // Check if the password meets all criteria
+    if (validationMessages.length > 0) {
+        validationContainer.style.color = 'red';
+        document.querySelector('form button[type="submit"]').disabled = true;
+    } else {
+        validationContainer.innerHTML = "Password looks good!";
+        validationContainer.style.color = 'green';
+        document.querySelector('form button[type="submit"]').disabled = false;
+    }
+});
+
 
     document.querySelector('form').addEventListener('submit', function(e) {
         const email = document.querySelector('input[name="email"]').value;
@@ -221,6 +257,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="form-group">
                     {{ form.password.label }}
                     {{ form.password(class="form-control", placeholder="Enter a password", required=True) }}
+                        <ul id="password-validation" class="validation-messages"></ul>
+
                 </div>
                 <div class="form-group">
                     {{ form.confirm_password.label }}

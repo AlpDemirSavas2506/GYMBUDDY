@@ -2,12 +2,19 @@
 {% block title %}Calendar - GymBuddy{% endblock %}
 {% block content %}
 
-<div class="container mt-4">
+<div class="container">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
     <div id="calendar"></div>
 </div>
+
+<style>
+    #calendar {
+        height: calc(100vh - 130px); /* Subtract navbar and footer height */
+        margin-top: 10px; /* Optional additional spacing */
+    }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

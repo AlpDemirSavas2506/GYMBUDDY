@@ -18,11 +18,17 @@
             editable: false,
             events: '/api/calendar', // Fetch reservations and events from the API
             eventClick: function (info) {
-                alert(`${info.event.title}\n${info.event.extendedProps.description}`);
+                const eventTitle = info.event.title;
+                const eventStart = info.event.start.toLocaleString(); // Convert to readable format
+                const eventEnd = info.event.end ? info.event.end.toLocaleString() : 'No end time';
+
+                // Display event details in an alert
+                alert(`${eventTitle}\nStart: ${eventStart}\nEnd: ${eventEnd}\n${info.event.extendedProps.description}`);
             }
         });
 
         calendar.render();
     });
 </script>
+
 {% endblock %}

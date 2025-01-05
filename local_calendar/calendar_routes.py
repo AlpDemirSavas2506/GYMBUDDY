@@ -1,20 +1,22 @@
 from flask import Blueprint, jsonify, render_template
 from models import Reservation, Event
 from datetime import datetime
+from flask_login import current_user, login_required
 
 calendar_bp = Blueprint('calendar_bp', __name__)
 
 @calendar_bp.route('/api/calendar', methods=['GET'])
+@login_required
 def get_calendar_data():
     # Fetch reservations
-    reservations = Reservation.query.all()
+    reservations = Reservation.query.filter_by(user_id=current_user.id).all()
     reservation_data = [
         {
             "id": f"reservation-{res.id}",
             "title": f"Reservation: {res.facility.name}",
             "start": res.start_time.isoformat(),
             "end": res.end_time.isoformat(),
-            "description": f"Reserved by: {res.user.username}",
+            "description": "",  # No description for reservations
             "type": "reservation"
         }
         for res in reservations
@@ -40,6 +42,7 @@ def get_calendar_data():
     return jsonify(combined_data)
 
 @calendar_bp.route('/calendar', methods=['GET'])
+@login_required
 def view_calendar():
     return render_template('calendar.html')
 

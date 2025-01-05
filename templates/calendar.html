@@ -21,14 +21,22 @@
                 const eventTitle = info.event.title;
                 const eventStart = info.event.start.toLocaleString(); // Convert to readable format
                 const eventEnd = info.event.end ? info.event.end.toLocaleString() : 'No end time';
+                const eventType = info.event.extendedProps.type; // Type of event (reservation or event)
 
-                // Display event details in an alert
-                alert(`${eventTitle}\nStart: ${eventStart}\nEnd: ${eventEnd}\n${info.event.extendedProps.description}`);
+                // Display event details
+                let message = `${eventTitle}\nStart Date: ${eventStart}\nEnd Date: ${eventEnd}`;
+                if (eventType === "event") {
+                    const description = info.event.extendedProps.description || "No description available";
+                    message += `\nDescription: ${description}`;
+                }
+
+                alert(message);
             }
         });
 
         calendar.render();
     });
 </script>
+
 
 {% endblock %}

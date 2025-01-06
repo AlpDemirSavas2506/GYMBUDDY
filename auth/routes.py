@@ -237,14 +237,26 @@ def forgot_password():
 def notification_preferences():
     form = NotificationPreferencesForm()
 
-    # Save preferences on POST
     if form.validate_on_submit():
-        current_user.notification_preferences = form.preferences.data
+        # Map form data to user's preferences
+        preferences = []
+        if form.reservation_notifications.data:
+            preferences.append('reservation')
+        if form.forum_notifications.data:
+            preferences.append('forum')
+        if form.event_notifications.data:
+            preferences.append('events')
+
+        # Update the user's preferences
+        current_user.notification_preferences = preferences
         db.session.commit()
         flash('Notification preferences updated!', 'success')
         return redirect(url_for('auth_bp.notification_preferences'))
 
     # Preload selected preferences on GET
-    form.preferences.data = current_user.notification_preferences
+    form.reservation_notifications.data = 'reservation' in current_user.notification_preferences
+    form.forum_notifications.data = 'forum' in current_user.notification_preferences
+    form.event_notifications.data = 'events' in current_user.notification_preferences
+
     return render_template('preferences.html', form=form)
 

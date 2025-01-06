@@ -3,25 +3,78 @@
 {% block content %}
 <div class="container mt-4">
     <h1 class="display-5">Notification Preferences</h1>
-    <form method="POST">
+
+    <form method="POST" id="preferencesForm">
         {{ form.hidden_tag() }}
-        <div class="mb-3">
-            {{ form.preferences.label }}
-            {{ form.preferences(class="form-control") }}
+        <div class="form-check mb-3">
+            {{ form.reservation_notifications(class="form-check-input") }}
+            {{ form.reservation_notifications.label(class="form-check-label") }}
+        </div>
+        <div class="form-check mb-3">
+            {{ form.forum_notifications(class="form-check-input") }}
+            {{ form.forum_notifications.label(class="form-check-label") }}
+        </div>
+        <div class="form-check mb-3">
+            {{ form.event_notifications(class="form-check-input") }}
+            {{ form.event_notifications.label(class="form-check-label") }}
         </div>
         <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <div class="alert-container">
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}" role="alert">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-{% endwith %}
-
     </form>
+
+    <!-- Message Box Modal -->
+    <div id="messageBox" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Preferences Saved</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Your notification preferences have been successfully updated!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="okButton">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- JavaScript to Handle Modal -->
+<script>
+    document.getElementById("preferencesForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent form submission
+
+        // Show the message box
+        const messageBox = document.getElementById("messageBox");
+        messageBox.style.display = "block";
+
+        // Hide the modal when the "OK" button is clicked
+        document.getElementById("okButton").addEventListener("click", function() {
+            messageBox.style.display = "none";
+            document.getElementById("preferencesForm").submit(); // Submit the form
+        });
+    });
+
+    // Modal styles
+    const modalStyle = document.createElement('style');
+    modalStyle.innerHTML = `
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1050; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+        }
+        .modal-dialog {
+            position: relative;
+            margin: 10% auto;
+            max-width: 500px;
+        }
+    `;
+    document.head.appendChild(modalStyle);
+</script>
 {% endblock %}

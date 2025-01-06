@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, FloatField
+from wtforms import StringField, PasswordField, SubmitField, FloatField, BooleanField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional, Regexp, NumberRange
 
 
@@ -111,14 +111,8 @@ from wtforms import SelectMultipleField, SubmitField
 from wtforms.validators import DataRequired
 
 class NotificationPreferencesForm(FlaskForm):
-    preferences = SelectMultipleField(
-        'Select Notifications You Want to Receive:',
-        choices=[
-            ('reservation', 'Reservation Notifications'),
-            ('forum', 'Forum Notifications'),
-            ('events', 'Event Notifications')
-        ],
-        validators=[DataRequired()]
-    )
+    reservation_notifications = BooleanField('Reservation Notifications')
+    forum_notifications = BooleanField('Forum Notifications')
+    event_notifications = BooleanField('Event Notifications')
     submit = SubmitField('Save Preferences')
 

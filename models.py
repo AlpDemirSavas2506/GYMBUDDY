@@ -100,3 +100,15 @@ class Notification(db.Model):
             "is_read": self.is_read,
             "created_at": self.created_at.strftime('%Y-%m-%d %H:%M:%S')
         }
+
+class UserEvent(db.Model):
+    __tablename__ = 'user_events'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    start = db.Column(db.DateTime, nullable=False)
+    end = db.Column(db.DateTime, nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    user = db.relationship('User', backref=db.backref('user_events', cascade='all, delete-orphan'))

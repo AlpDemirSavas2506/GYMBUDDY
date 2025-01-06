@@ -1,4 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file
+from flask_login import current_user
+
 from models import Event, db, User
 import io
 from flask_wtf import FlaskForm
@@ -65,3 +67,18 @@ def event_image(event_id):
     else:
         flash('No image found for this event.', 'warning')
         return redirect(url_for('events_bp.events'))
+@events_bp.route('/delete-event/<int:event_id>', methods=['POST'])
+def delete_event(event_id):
+    if not current_user.is_admin():  # Only admins can delete events
+        flash("You do not have permission to delete events.", "danger")
+        return redirect(url_for('events_bp.events'))
+
+    event = Event.query.get(event_id)
+    if not event:
+        flash("Event not found.", "danger")
+        return redirect(url_for('events_bp.events'))
+
+    db.session.delete(event)
+    db.session.commit()
+    flash("Event deleted successfully.", "success")
+    return redirect(url_for('events_bp.events'))

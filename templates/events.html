@@ -47,6 +47,11 @@
                     </div>
                     {% endif %}
                     <p>{{ event.description }}</p>
+                    {% if current_user.is_admin() %}
+        <form method="POST" action="{{ url_for('events_bp.delete_event', event_id=event.id) }}" style="display: inline;">
+            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+        </form>
+        {% endif %}
                 </div>
             </div>
         </div>

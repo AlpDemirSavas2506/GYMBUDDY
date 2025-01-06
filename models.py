@@ -23,7 +23,10 @@ class User(db.Model, UserMixin):
     emergency_contact_number = db.Column(db.String(20))
     reservations = db.relationship('Reservation', back_populates='user', cascade='all, delete-orphan')
     notification_preferences = db.Column(ARRAY(TEXT), default=[])
+    role = db.Column(db.String(50), default='user')  # Default role is 'user'
 
+    def is_admin(self):
+        return self.role == 'admin'
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 

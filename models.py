@@ -38,6 +38,7 @@ class Facility(db.Model):
     __tablename__ = 'facilities'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False, unique=True)
+    is_available = db.Column(db.Boolean, default=True)
 
     # Relationship to reservations
     reservations = db.relationship('Reservation', back_populates='facility', cascade='all, delete-orphan')

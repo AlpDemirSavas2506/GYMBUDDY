@@ -82,6 +82,7 @@ def create_app():
     from events.event_routes import events_bp
     from notification.notification_routes import notification_bp
     from local_calendar.calendar_routes import calendar_bp
+    from admin.admin_routes import admin_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(reservation_bp)
@@ -89,6 +90,7 @@ def create_app():
     app.register_blueprint(events_bp)
     app.register_blueprint(notification_bp)
     app.register_blueprint(calendar_bp)
+    app.register_blueprint(admin_bp)
 
     @app.errorhandler(404)
     def page_not_found(e):

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Booking Analytics{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="display-5">Booking Analytics</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Facility</th>
+                <th>Number of Reservations</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in analytics %}
+            <tr>
+                <td>{{ data[0] }}</td>
+                <td>{{ data[1] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Manage Facilities{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="display-5 text-center mb-4">Manage Facilities</h1>
+    
+    <form method="POST">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Facility</th>
+                    <th>Availability</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for facility in facilities %}
+                <tr>
+                    <td>{{ facility.name }}</td>
+                    <td>
+                        {% if facility.is_available %}
+                        <span class="badge bg-success">Available</span>
+                        {% else %}
+                        <span class="badge bg-danger">Unavailable</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button type="submit" name="facility_id" value="{{ facility.id }}" class="btn btn-warning">
+                            Toggle Availability
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="display-5 text-center mb-4">Admin Dashboard</h1>
+
+    <div class="row">
+        <!-- Manage Facility Availability -->
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Manage Facility Availability</h5>
+                    <p class="card-text">Update and manage the availability of facilities for users.</p>
+                    <a href="{{ url_for('admin_bp.manage_facilities') }}" class="btn btn-primary btn-lg">
+                        Manage Facilities
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- View Booking Analytics -->
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">View Booking Analytics</h5>
+                    <p class="card-text">Analyze booking trends and usage statistics for all facilities.</p>
+                    <a href="{{ url_for('admin_bp.view_analytics') }}" class="btn btn-success btn-lg">
+                        View Analytics
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

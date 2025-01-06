@@ -1,8 +1,9 @@
 from flask_mail import Message
 from flask_login import current_user
 from config import mail
-from flask import render_template
+from flask import render_template, url_for, flash, redirect
 from models import Notification, User, db
+from functools import wraps
 import base64
 
 def send_email(subject, recipient, html_body):
@@ -154,3 +155,12 @@ def notify_forum_users(topic_title, topic_replier_name, topic_owner_id, repliers
                 f_message=reply_message,
                 is_owner=True
             )
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not current_user.is_admin():
+            flash("Access denied! Admins only.", "danger")
+            return redirect(url_for('home'))
+        return f(*args, **kwargs)
+    return decorated_function

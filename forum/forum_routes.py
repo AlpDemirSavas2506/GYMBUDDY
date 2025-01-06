@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from models import ForumTopic, ForumReply, db, User
 from auth.forms import CreateTopicForm, ReplyForm
-from utility import create_notification, send_topic_created_email
+from utility import create_notification, send_topic_created_email, notify_forum_users
 
 forum_bp = Blueprint('forum_bp', __name__)
 
@@ -59,6 +59,23 @@ def topic_detail(topic_id):
         )
         db.session.add(new_reply)
         db.session.commit()
+
+        # Get the list of users who have replied to this topic (excluding duplicates)
+        repliers = (
+            User.query.join(ForumReply, User.id == ForumReply.user_id)
+            .filter(ForumReply.topic_id == topic_id, User.id != current_user.id)
+            .distinct()
+            .all()
+        )
+
+        # Notify the topic owner and repliers
+        notify_forum_users(
+            topic_title=topic.title,
+            topic_replier_name=current_user.username,
+            topic_owner_id=topic.user_id,
+            repliers=repliers,
+            reply_message=form.content.data
+        )
 
         flash('Reply posted successfully!', 'success')
         return redirect(url_for('forum_bp.topic_detail', topic_id=topic_id))

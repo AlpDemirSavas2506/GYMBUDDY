@@ -125,19 +125,20 @@ def reservation():
             try:
                 db.session.delete(reservation)
                 db.session.commit()
-
-                # Create a notification for the user
-                create_notification(
-                user_id=current_user.id,
-                message=f"Your reservation for {facility.name} on start date: {reservation.start_time} end date: {reservation.end_time} has been cancelled."
-                )
                 
-                send_cancellation_email(
-                    user=current_user,
-                    f_facility_name=facility.name,
-                    f_start_time=reservation.start_time,
-                    f_end_time=reservation.end_time
-                )
+                  # Create a notification for the user
+                if 'reservation' in current_user.notification_preferences:
+                    create_notification(
+                    user_id=current_user.id,
+                    message=f"Your reservation for {facility.name} on start date: {reservation.start_time} end date: {reservation.end_time} has been cancelled."
+                    )
+                    
+                    send_cancellation_email(
+                        user=current_user,
+                        f_facility_name=facility.name,
+                        f_start_time=reservation.start_time,
+                        f_end_time=reservation.end_time
+                    )
 
                 return jsonify(success=True)
             except Exception as e:
@@ -182,17 +183,18 @@ def reservation():
                 db.session.commit()
                 
                 # Create a notification for the user
-                create_notification(
-                    user_id=current_user.id,
-                    message=f"Your reservation for {facility.name} on start date: {new_reservation.start_time} end date: {new_reservation.end_time} has been confirmed."
-                )
+                if 'reservation' in current_user.notification_preferences:
+                    create_notification(
+                        user_id=current_user.id,
+                        message=f"Your reservation for {facility.name} on start date: {new_reservation.start_time} end date: {new_reservation.end_time} has been confirmed."
+                    )
 
-                send_reservation_email(
-                    user=current_user,
-                    f_facility_name=facility.name,
-                    f_start_time=new_reservation.start_time,
-                    f_end_time=new_reservation.end_time
-                )
+                    send_reservation_email(
+                        user=current_user,
+                        f_facility_name=facility.name,
+                        f_start_time=new_reservation.start_time,
+                        f_end_time=new_reservation.end_time
+                    )
 
                 return jsonify(success=True)
             except Exception as e:

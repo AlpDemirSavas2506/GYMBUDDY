@@ -74,7 +74,9 @@ def create_user_event():
 @calendar_bp.route('/calendar/user-events/<int:event_id>', methods=['DELETE'])
 @login_required
 def delete_user_event(event_id):
-    event = UserEvent.query.get_or_404(event_id)
+    event = UserEvent.query.get(event_id)
+    if not event:
+        return jsonify({'error': 'Event not found'}), 404
     if event.user_id != current_user.id:
         return jsonify({'error': 'Unauthorized access'}), 403
     db.session.delete(event)

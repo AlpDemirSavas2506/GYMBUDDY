@@ -84,7 +84,9 @@ def delete_topic(topic_id):
     topic = ForumTopic.query.get_or_404(topic_id)
 
     # Ensure the current user owns the topic or has admin privileges
-    if topic.user_id != current_user.id:
+    if current_user.is_admin():
+        pass
+    elif topic.user_id != current_user.id:
         flash('You do not have permission to delete this topic.', 'danger')
         return redirect(url_for('forum_bp.topic_detail', topic_id=topic_id))
 
@@ -104,7 +106,9 @@ def delete_reply(reply_id):
     reply = ForumReply.query.get_or_404(reply_id)
 
     # Ensure the current user owns the reply or has admin privileges
-    if reply.user_id != current_user.id:
+    if current_user.is_admin():
+        pass
+    elif reply.user_id != current_user.id:
         flash('You do not have permission to delete this reply.', 'danger')
         return redirect(url_for('forum_bp.topic_detail', topic_id=reply.topic_id))
 

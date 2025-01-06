@@ -23,17 +23,18 @@ def forum():
         # Notify users who want forum notifications
         users = User.query.filter(User.notification_preferences.contains(['forum'])).all()
         for user in users:
-            create_notification(
-                user_id=user.id,
-                message=f"New discussion started: {new_topic.title} by {current_user.username}"
-            )
+            if current_user.id != user.id:
+                create_notification(
+                    user_id=user.id,
+                    message=f"New discussion started: {new_topic.title} by {current_user.username}"
+                )
 
-            send_topic_created_email(
-            user=user,
-            f_topic_title=new_topic.title,
-            f_topic_creator_name=current_user.username,             
-            f_message=new_topic.explanation
-            )
+                send_topic_created_email(
+                user=user,
+                f_topic_title=new_topic.title,
+                f_topic_creator_name=current_user.username,             
+                f_message=new_topic.explanation
+                )
 
         flash('Topic created successfully!', 'success')
         return redirect(url_for('forum_bp.forum'))

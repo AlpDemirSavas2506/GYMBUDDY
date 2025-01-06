@@ -1,23 +1,100 @@
 {% extends "base.html" %}
-{% block title %}Booking Analytics{% endblock %}
+{% block title %}Booking Analytics - GymBuddy{% endblock %}
 {% block content %}
 <div class="container mt-4">
-    <h1 class="display-5">Booking Analytics</h1>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Facility</th>
-                <th>Number of Reservations</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for data in analytics %}
-            <tr>
-                <td>{{ data[0] }}</td>
-                <td>{{ data[1] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <h1 class="display-5 text-center">Booking Analytics</h1>
+
+    <!-- Date Range Filter Form -->
+    <form method="GET" action="{{ url_for('admin_bp.view_analytics') }}" class="row g-3 mt-4">
+        <div class="col-md-4">
+            <label for="start_date" class="form-label">Start Date</label>
+            <input type="date" id="start_date" name="start_date" class="form-control" 
+                   value="{{ start_date }}" required>
+        </div>
+        <div class="col-md-4">
+            <label for="end_date" class="form-label">End Date</label>
+            <input type="date" id="end_date" name="end_date" class="form-control" 
+                   value="{{ end_date }}" required>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <a href="{{ url_for('admin_bp.view_analytics') }}" class="btn btn-secondary w-100">Clear Filter</a>
+        </div>
+    </form>
+
+    <!-- Analytics Table -->
+    <div class="mt-5">
+        <h3>Reservation Summary</h3>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Facility Name</th>
+                    <th>Reservation Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for facility, reservation_count in analytics %}
+                <tr>
+                    <td>{{ facility }}</td>
+                    <td>{{ reservation_count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pie Chart -->
+    <div class="mt-5">
+        <h3>Reservation Distribution</h3>
+        <canvas id="reservationChart"></canvas>
+    </div>
 </div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('reservationChart').getContext('2d');
+    const reservationChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: {{ chart_labels | safe }},
+            datasets: [{
+                label: 'Reservations',
+                data: {{ chart_values | safe }},
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                    '#9966FF',
+                    '#FF9F40',
+                    '#E7E9ED'
+                ],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += context.raw;
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

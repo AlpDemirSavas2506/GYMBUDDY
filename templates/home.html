@@ -49,17 +49,35 @@
         .list li:nth-child(odd) {
             background-color: #f1f1f1;
         }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2em 0.4em;
+            font-size: 0.75em;
+            font-weight: bold;
+            color: #fff;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+
+        .badge.available {
+            background-color: #28a745;
+        }
+
+        .badge.unavailable {
+            background-color: #dc3545;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Kullanıcıya Özgü Karşılama Mesajı -->
+        <!-- Welcome Message -->
         <div class="section">
             <h1>Welcome, {{ current_user.name }}!</h1>
             <p class="welcome-message">Here are your reservations:</p>
         </div>
 
-        <!-- Yaklaşan Rezervasyonlar -->
+        <!-- Upcoming Reservations -->
         <div class="section">
             <h2>Upcoming Reservations</h2>
             {% if upcoming_reservations %}
@@ -67,7 +85,10 @@
                 {% for reservation in upcoming_reservations %}
                 <li>
                     <strong>{{ reservation.facility.name }}</strong><br>
-                    {{ reservation.start_time.strftime('%d %b %Y, %I:%M %p') }} - {{ reservation.end_time.strftime('%I:%M %p') }}
+                    {{ reservation.start_time.strftime('%d %b %Y, %I:%M %p') }} - {{ reservation.end_time.strftime('%I:%M %p') }}<br>
+                    <span class="badge {% if reservation.facility.is_available %}available{% else %}unavailable{% endif %}">
+                        {% if reservation.facility.is_available %}Available{% else %}Unavailable{% endif %}
+                    </span>
                 </li>
                 {% endfor %}
             </ul>
@@ -76,7 +97,7 @@
             {% endif %}
         </div>
 
-        <!-- Geçmiş Rezervasyonlar -->
+        <!-- Past Reservations -->
         <div class="section">
             <h2>Past Reservations</h2>
             {% if past_reservations %}

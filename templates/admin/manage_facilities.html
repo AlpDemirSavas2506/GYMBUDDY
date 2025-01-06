@@ -1,38 +1,54 @@
 {% extends "base.html" %}
-{% block title %}Manage Facilities{% endblock %}
+{% block title %}Manage Facilities - GymBuddy{% endblock %}
 {% block content %}
 <div class="container mt-4">
-    <h1 class="display-5 text-center mb-4">Manage Facilities</h1>
-    
-    <form method="POST">
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>Facility</th>
-                    <th>Availability</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for facility in facilities %}
-                <tr>
-                    <td>{{ facility.name }}</td>
-                    <td>
-                        {% if facility.is_available %}
-                        <span class="badge bg-success">Available</span>
-                        {% else %}
-                        <span class="badge bg-danger">Unavailable</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <button type="submit" name="facility_id" value="{{ facility.id }}" class="btn btn-warning">
+    <h1 class="display-5 text-center">Manage Facilities</h1>
+
+    <!-- Bulk Action Buttons -->
+    <div class="text-center mb-4">
+        <form method="POST" style="display: inline;">
+            <button type="submit" name="action" value="make_all_available" class="btn btn-success">
+                Make All Available
+            </button>
+        </form>
+        <form method="POST" style="display: inline;">
+            <button type="submit" name="action" value="make_all_unavailable" class="btn btn-danger">
+                Make All Unavailable
+            </button>
+        </form>
+    </div>
+
+    <!-- Facilities Table -->
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Facility Name</th>
+                <th>Availability</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for facility in facilities %}
+            <tr>
+                <td>{{ facility.name }}</td>
+                <td>
+                    {% if facility.is_available %}
+                    <span class="badge bg-success">Available</span>
+                    {% else %}
+                    <span class="badge bg-danger">Unavailable</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <form method="POST" style="display: inline;">
+                        <input type="hidden" name="facility_id" value="{{ facility.id }}">
+                        <button type="submit" name="action" value="toggle" class="btn btn-warning btn-sm">
                             Toggle Availability
                         </button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </form>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

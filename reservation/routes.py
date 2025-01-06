@@ -11,7 +11,7 @@ reservation_bp = Blueprint('reservation_bp', __name__)
 @login_required
 def reservation():
     if request.method == 'GET':
-        facilities = Facility.query.all()
+        facilities = Facility.query.filter_by(is_available=True).all()
         date = request.args.get('date')  # Optional query parameter for date
         facility_id = request.args.get('facility_id')  # Optional facility parameter
 
@@ -20,6 +20,11 @@ def reservation():
             date_obj = datetime.strptime(date, '%Y-%m-%d')
             opening_time = datetime.combine(date_obj, datetime.strptime("08:00", "%H:%M").time())
             closing_time = datetime.combine(date_obj, datetime.strptime("22:00", "%H:%M").time())
+
+            # Fetch the facility and validate its availability
+            facility = Facility.query.get(facility_id)
+            if not facility or not facility.is_available:
+                return jsonify({'error': 'This facility is currently unavailable.'}), 403
 
             # Facility lists for different intervals
             one_hour_facilities = [
@@ -53,6 +58,10 @@ def reservation():
             # Determine slot duration based on facility
             slot_duration = timedelta(minutes=60)  # Default to 1-hour slots
             facility = Facility.query.get(facility_id)
+
+            if not facility or not facility.is_available:
+                return jsonify({'error': 'This facility is unavailable.'}), 403
+            
             if facility.name in forty_minute_facilities:
                 slot_duration = timedelta(minutes=40)  # 40-minute slots for specific facilities
 
@@ -149,6 +158,10 @@ def reservation():
                 return jsonify({'error': 'Please provide all required details.'}), 400
 
             try:
+                facility = Facility.query.get(facility_id)
+                if not facility or not facility.is_available:
+                    return jsonify({'error': 'This facility is currently unavailable.'}), 403
+                
                 start_time = datetime.fromisoformat(start_time)
                 end_time = datetime.fromisoformat(end_time)
 

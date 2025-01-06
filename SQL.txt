@@ -142,5 +142,6 @@ CREATE TABLE user_events (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- Cascade delete when a user is removed
 );
 
-
+ALTER TABLE public.users
+ADD COLUMN role VARCHAR(50) DEFAULT 'user' NOT NULL;
 

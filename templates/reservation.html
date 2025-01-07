@@ -390,6 +390,9 @@
             console.error('Error updating notification count:', error);
         }
     }
+    document.addEventListener('DOMContentLoaded', () => {
+        updateNotificationCount();
+    });
 </script>
 
 {% endblock %}

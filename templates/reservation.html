@@ -19,14 +19,15 @@
 
         <div class="form-group">
             <label for="date">Date:</label>
-<input type="date" id="date" name="date" class="form-control" required
-       min="{{ datetime.utcnow().strftime('%Y-%m-%d') }}"
-       max="{{ (datetime.utcnow() + timedelta(days=7)).strftime('%Y-%m-%d') }}">        </div>
+            <input type="date" id="date" name="date" class="form-control" required
+                   min="{{ datetime.utcnow().strftime('%Y-%m-%d') }}"
+                   max="{{ (datetime.utcnow() + timedelta(days=30)).strftime('%Y-%m-%d') }}">
+        </div>
 
         <button type="button" id="fetch-slots" class="btn btn-primary btn-block">View Available Slots</button>
     </form>
 
-     <div id="slots-container" style="display: none; margin-top: 20px;">
+    <div id="slots-container" style="display: none; margin-top: 20px;">
         <h2 class="slots-heading">Available Time Slots</h2>
         <div id="slots" class="slots-grid">
             <!-- Slots will be dynamically loaded here -->
@@ -115,52 +116,114 @@
     .btn-block {
         display: block;
     }
+
     /* General grid layout */
-.slots-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
-}
+    .slots-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
 
-/* Slot cards */
-.slot {
-    padding: 15px;
-    border-radius: 8px;
-    text-align: center;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
+    /* Slot cards */
+    .slot {
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative; /* For tooltip positioning */
+    }
 
-/* Available slot styling */
-.slot.available {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
+    /* Available slot styling */
+    .slot.available {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
 
-/* Unavailable slot styling */
-.slot.unavailable {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-    pointer-events: auto; /* Make unavailable slots unclickable */
-}
+    /* Full slot styling */
+    .slot.full {
+        background-color: #f44336; /* Daha canlı kırmızı */
+        color: white; /* Yazıyı beyaz yaparak okunabilirliği artırın */
+        border: 1px solid #f44336; /* Sınırı da aynı renkte yapın */
+        cursor: not-allowed; /* Fare imlecini değiştirerek tıklanamaz olduğunu gösterin */
+        opacity: 0.8; /* Hafif opaklık ekleyerek vurgu yapın */
+        pointer-events: none; /* Tıklanamaz yapar */
+    }
 
-/* Hover effect */
-.slot:hover {
-    transform: scale(1.05);
-}
+    /* Reserved slot styling (Kullanıcının kendi rezervasyonu) */
+    .slot.reserved {
+        background-color: #ff5722; /* Farklı bir canlı kırmızı tonu */
+        color: white; /* Yazıyı beyaz yaparak okunabilirliği artırın */
+        border: 1px solid #ff5722; /* Sınırı da aynı renkte yapın */
+        cursor: not-allowed; /* Fare imlecini değiştirerek tıklanamaz olduğunu gösterin */
+        opacity: 0.9; /* Hafif opaklık ekleyerek vurgu yapın */
+    }
 
-/* Username styling for unavailable slots */
-.slot .username {
-    font-size: 12px;
-    font-weight: normal;
-    color: #555;
-    margin-top: 5px;
-}
+    /* Hover effect for reserved slots */
+    .slot.reserved:hover {
+        transform: none; /* Hover etkisini kaldırın */
+        box-shadow: none; /* Hover sırasında gölge eklenmesini engelleyin */
+    }
+
+    /* Hover effect for available slots */
+    .slot.available:hover {
+        transform: scale(1.05);
+    }
+
+    /* Username styling for unavailable slots */
+    .slot .username {
+        font-size: 12px;
+        font-weight: normal;
+        color: #555;
+        margin-top: 5px;
+    }
+
+    /* Remaining capacity styling */
+    .slot .remaining-capacity {
+        font-size: 12px;
+        color: #333;
+        margin-top: 5px;
+    }
+
+    /* Tooltip stil ekleme (Opsiyonel) */
+    .slot.full[data-tooltip]:hover::after,
+    .slot.reserved[data-tooltip]:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.75);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        font-size: 12px;
+        pointer-events: none;
+        opacity: 1;
+        transition: opacity 0.3s;
+    }
+
+    /* Cancel Button Styling */
+    .btn-cancel {
+        margin-top: 10px;
+        padding: 6px 12px;
+        font-size: 12px;
+        background-color: #dc3545; /* Bootstrap danger renk tonu */
+        border: none;
+        border-radius: 4px;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+        background-color: #c82333;
+    }
 </style>
 
 <script>
@@ -195,38 +258,70 @@
                 slotsContainer.style.display = 'block';
                 data.available_slots.forEach(slot => {
                     const div = document.createElement('div');
-                    div.className = `slot ${slot.available ? 'available' : 'unavailable'}`;
-                    div.textContent = `${new Date(slot.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(slot.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 
-                    if (!slot.available) {
-                        const usernameDiv = document.createElement('div');
-                        usernameDiv.className = 'username';
-                        usernameDiv.textContent = `Reserved by: ${slot.username}`;
-                        div.appendChild(usernameDiv);
+                    // Slot sınıfını belirleme
+                    let slotClass = 'slot ';
+                    if (slot.is_reserved_by_user) {
+                        slotClass += 'reserved';
+                    } else if (slot.available) {
+                        slotClass += 'available';
+                    } else {
+                        slotClass += 'full';
+                    }
+                    div.className = slotClass;
 
-                        if (slot.username === "{{ current_user.username }}") {
-                            const cancelButton = document.createElement('button');
-                            cancelButton.textContent = 'Cancel';
-                            cancelButton.className = 'btn btn-danger';
-                            cancelButton.addEventListener('click', async (e) => {
-                                e.stopPropagation(); // Prevent the parent slot click event
-                                if (confirm("Are you sure you want to cancel this reservation?")) {
+                    // Slot saatlerini göster
+                    const startTime = new Date(slot.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const endTime = new Date(slot.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    div.textContent = `${startTime} - ${endTime}`;
+
+                    if (slot.is_reserved_by_user) {
+                        // Kullanıcının kendi rezervasyonunu belirgin hale getirin
+                        const reservedByDiv = document.createElement('div');
+                        reservedByDiv.className = 'username';
+                        reservedByDiv.textContent = `Your Reservation`;
+                        div.appendChild(reservedByDiv);
+
+                        // Cancel Button
+                        const cancelButton = document.createElement('button');
+                        cancelButton.className = 'btn-cancel';
+                        cancelButton.textContent = 'Cancel';
+                        cancelButton.addEventListener('click', async (event) => {
+                            event.stopPropagation(); // Slot tıklama olayını engelle
+                            if (confirm("Are you sure you want to cancel this reservation?")) {
+                                try {
                                     const cancelResponse = await fetch('/reservation', {
                                         method: 'POST',
                                         headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({ operation: 'cancel', reservation_id: slot.reservation_id })
                                     });
-                                    if (cancelResponse.ok) {
-                                        alert('Reservation canceled!');
-                                        document.getElementById('fetch-slots').click(); // Refresh slots
+
+                                    const result = await cancelResponse.json();
+                                    if (cancelResponse.ok && result.success) {
+                                        alert('Reservation canceled successfully.');
+                                        document.getElementById('fetch-slots').click();  // Refresh slots
+                                        await updateNotificationCount();  // Update notifications dynamically
                                     } else {
-                                        alert('Failed to cancel reservation.');
+                                        alert(`Failed to cancel reservation: ${result.error || 'Unknown error'}`);
                                     }
+                                } catch (error) {
+                                    console.error(error);
+                                    alert("An error occurred while canceling the reservation.");
                                 }
-                            });
-                            div.appendChild(cancelButton);
-                        }
-                    } else {
+                            }
+                        });
+                        div.appendChild(cancelButton);
+
+                        // Tooltip ekleme (Opsiyonel)
+                        div.setAttribute('data-tooltip', 'You have reserved this slot.');
+                    } else if (slot.available) {
+                        // Kalan kapasiteyi göster
+                        const capacityDiv = document.createElement('div');
+                        capacityDiv.className = 'remaining-capacity';
+                        capacityDiv.textContent = `Remaining Capacity: ${slot.remaining_capacity}`;
+                        div.appendChild(capacityDiv);
+
+                        // Rezervasyon işlemi
                         div.addEventListener('click', async () => {
                             if (confirm("Do you want to reserve this slot?")) {
                                 const reserveResponse = await fetch('/reservation', {
@@ -241,18 +336,25 @@
                                 });
                                 if (reserveResponse.ok) {
                                     alert('Reservation successful!');
-                                   await new Promise(resolve => {
-                                        document.getElementById('fetch-slots').click();  // Refresh slots
-                                        setTimeout(resolve, 500);  // Wait 500ms to ensure fetch-slots finishes
-                                    });
-
-                                   await updateNotificationCount();  // Update notifications dynamically
+                                    document.getElementById('fetch-slots').click();  // Refresh slots
+                                    await updateNotificationCount();  // Update notifications dynamically
                                 } else {
                                     const error = await reserveResponse.json();
                                     alert(`Failed to reserve slot: ${error.error || 'Unknown error'}`);
                                 }
                             }
                         });
+                    } else {
+                        // Dolmuş slotlar için kullanıcı adlarını gösterebilirsiniz (isteğe bağlı)
+                        if (slot.reserved_by && slot.reserved_by.length > 0) {
+                            const reservedByDiv = document.createElement('div');
+                            reservedByDiv.className = 'username';
+                            reservedByDiv.textContent = `Reserved by: ${slot.reserved_by.join(', ')}`;
+                            div.appendChild(reservedByDiv);
+
+                            // Tooltip ekleme (Opsiyonel)
+                            div.setAttribute('data-tooltip', 'This slot is fully booked.');
+                        }
                     }
 
                     slotsGrid.appendChild(div);
@@ -266,28 +368,28 @@
             alert("An error occurred while fetching slots. Please try again.");
         }
     });
+
     async function updateNotificationCount() {
-    try {
-        const response = await fetch('/notifications');
-        if (!response.ok) throw new Error("Failed to fetch notifications.");
+        try {
+            const response = await fetch('/notifications');
+            if (!response.ok) throw new Error("Failed to fetch notifications.");
 
-        const data = await response.json();
-        const unreadCount = data.filter(n => !n.is_read).length;
+            const data = await response.json();
+            const unreadCount = data.filter(n => !n.is_read).length;
 
-        const badge = document.getElementById('notificationBadge');
+            const badge = document.getElementById('notificationBadge');
 
-        if (unreadCount > 0) {
-            badge.textContent = unreadCount;
-            badge.style.display = 'inline-flex';
-        } else {
-            badge.textContent = '';
-            badge.style.display = 'none';
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount;
+                badge.style.display = 'inline-flex';
+            } else {
+                badge.textContent = '';
+                badge.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Error updating notification count:', error);
         }
-    } catch (error) {
-        console.error('Error updating notification count:', error);
     }
-}
 </script>
-
 
 {% endblock %}

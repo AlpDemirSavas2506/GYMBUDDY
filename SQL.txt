@@ -148,4 +148,7 @@ ADD COLUMN role VARCHAR(50) DEFAULT 'user' NOT NULL;
 ALTER TABLE facilities ADD COLUMN is_available BOOLEAN DEFAULT TRUE;
 
 ALTER TABLE public.facilities
-ADD COLUMN capacity integer NOT NULL DEFAULT 1;
+ADD COLUMN capacity integer NOT NULL DEFAULT 10;
+
+UPDATE public.facilities
+SET capacity = 10

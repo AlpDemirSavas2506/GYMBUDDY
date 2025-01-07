@@ -47,16 +47,23 @@
 
     <!-- Pie Chart -->
     <div class="mt-5">
-        <h3>Reservation Distribution</h3>
-        <canvas id="reservationChart"></canvas>
+        <h3>Reservation Distribution (Pie Chart)</h3>
+        <canvas id="reservationChart" style="max-height: 400px;"></canvas>
+    </div>
+
+    <!-- Bar Chart -->
+    <div class="mt-5">
+        <h3>Reservation Distribution (Bar Chart)</h3>
+        <canvas id="reservationBarChart" style="max-height: 400px;"></canvas>
     </div>
 </div>
 
 <!-- Chart.js Script -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const ctx = document.getElementById('reservationChart').getContext('2d');
-    const reservationChart = new Chart(ctx, {
+    // Pie Chart
+    const pieCtx = document.getElementById('reservationChart').getContext('2d');
+    const reservationPieChart = new Chart(pieCtx, {
         type: 'pie',
         data: {
             labels: {{ chart_labels | safe }},
@@ -77,6 +84,7 @@
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     position: 'top'
@@ -90,6 +98,59 @@
                             }
                             label += context.raw;
                             return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Bar Chart
+    const barCtx = document.getElementById('reservationBarChart').getContext('2d');
+    const reservationBarChart = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_labels | safe }},
+            datasets: [{
+                label: 'Reservation Count',
+                data: {{ chart_values | safe }},
+                backgroundColor: '#36A2EB',
+                borderColor: '#2F8EE0',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Facility Names',
+                        font: {
+                            size: 14
+                        }
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Reservation Count',
+                        font: {
+                            size: 14
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false // Hide legend for bar chart
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.raw} reservations`;
                         }
                     }
                 }
